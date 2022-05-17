@@ -1,6 +1,6 @@
 import typescript from 'rollup-plugin-typescript2'
-import commonjs from 'rollup-plugin-commonjs'
 import del from 'rollup-plugin-delete'
+import commonjs from '@rollup/plugin-commonjs'
 
 export default {
   input: './lib/index.ts',
@@ -8,8 +8,7 @@ export default {
   output: [
     {
       file: './dist/index.js',
-      format: 'umd',
-      name: 'MangaBridge'
+      format: 'commonjs'
     },
     {
       file: './dist/index.esm.js',
@@ -23,7 +22,7 @@ export default {
     typescript({
       tsconfigOverride: {
         compilerOptions: {
-          target: 'es5',
+          target: 'es5'
         },
         include: [
           'lib/**/*'
@@ -34,5 +33,10 @@ export default {
     del({
       targets: 'dist/*'
     })
+  ],
+
+  external: [
+    'camelcase',
+    '@vue/composition-api'
   ]
 }
