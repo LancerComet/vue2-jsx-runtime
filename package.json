@@ -1,0 +1,55 @@
+{
+  "name": "@lancercomet/vue2-jsx-runtime",
+  "version": "0.1.0",
+  "description": "JSX runtime for Vue 2.",
+  "main": "./dist/index.js",
+  "module": "./dist/index.esm.js",
+  "files": [
+    "dist/",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "rollup -c",
+    "lint": "eslint ./lib/**",
+    "test": "jest",
+    "prebuild": "npm run lint",
+    "pretest": "npm run build",
+    "preversion": "npm run test",
+    "prepublish": "npm run test",
+    "postbuild": "node ./post-build.js"
+  },
+  "author": {
+    "name": "LancerComet",
+    "email": "chw644@hotmail.com"
+  },
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "@vue/composition-api": "1",
+    "vue": "2"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.3",
+    "@typescript-eslint/eslint-plugin": "^5.7.0",
+    "@typescript-eslint/parser": "^5.7.0",
+    "@vue/composition-api": "^1.6.1",
+    "@vue/test-utils": "^1.3.0",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.2.0",
+    "jest": "^27.4.5",
+    "rollup": "^2.61.1",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-delete": "^2.0.0",
+    "rollup-plugin-typescript2": "^0.31.1",
+    "ts-jest": "^27.1.2",
+    "tslib": "^2.4.0",
+    "typescript": "^4.5.4",
+    "typescript-formatter": "^7.2.2",
+    "vue": "^2.6.14"
+  },
+  "dependencies": {
+    "camelcase": "^6.3.0"
+  }
+}
