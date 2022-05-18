@@ -13,9 +13,8 @@
     "lint": "eslint ./lib/**",
     "test": "jest",
     "prebuild": "npm run lint",
-    "pretest": "npm run build",
-    "preversion": "npm run test",
-    "prepublish": "npm run test",
+    "preversion": "npm run build && npm run test",
+    "prepublish": "npm run build && npm run test",
     "postbuild": "node ./post-build.js"
   },
   "author": {
