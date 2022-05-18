@@ -1,4 +1,4 @@
-import { h, Ref } from '@vue/composition-api'
+import { h } from '@vue/composition-api'
 import { VNode, VNodeChildren, VNodeData } from 'vue'
 import { AsyncComponent, Component } from 'vue/types/options'
 import {
@@ -18,10 +18,11 @@ import {
   isArray,
   isUndefined,
   removeNativeOn,
-  removeOn, checkKeyIsRef
+  removeOn, checkKeyIsRef, isObject, isString
 } from './utils'
 import { Fragment } from './fragment'
-import { dealWithVModel } from './v-model'
+import { dealWithVModelComposition } from './modules/v-model.composition'
+import { dealWithVModelRender } from './modules/v-model.render'
 
 const jsx = (
   tag: string | Component<any, any, any, any> | AsyncComponent<any, any, any, any> | (() => Component),
@@ -116,7 +117,18 @@ const jsx = (
 
     // Deal with input v-model with HTML Input.
     if (tag === 'input' && checkKeyIsVModel(key)) {
-      dealWithVModel(key, config, vNodeData)
+      // Skip unsupported input.
+      const inputType = config.type
+      const isSkippedInput = /button|submit|reset/.test(inputType)
+      if (isSkippedInput) {
+        continue
+      }
+
+      if (isString(config[key])) {
+        dealWithVModelRender(key, config, vNodeData)
+      } else if (isObject(config[key])) {
+        dealWithVModelComposition(key, config, vNodeData)
+      }
       continue
     }
 

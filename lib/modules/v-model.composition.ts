@@ -1,4 +1,4 @@
-import { isArray, isObject, isUndefined } from './utils'
+import { isArray, isUndefined } from '../utils'
 import { Ref } from '@vue/composition-api'
 import { VNodeChildren, VNodeData } from 'vue'
 
@@ -10,23 +10,12 @@ import { VNodeChildren, VNodeData } from 'vue'
  * @param config
  * @param vNodeData
  */
-const dealWithVModel = (key: string, config: {
+const dealWithVModelComposition = (key: string, config: {
   children?: VNodeChildren
   [props: string]: any
 }, vNodeData: VNodeData) => {
-  const isRefValue = isObject(config[key])
-  if (!isRefValue) {
-    return
-  }
-
   const vModelBinding = config[key] as Ref<unknown>
   const inputType = config.type
-
-  // Unbindable inputs.
-  const isSkippedInput = /button|submit|reset/.test(inputType)
-  if (isSkippedInput) {
-    return
-  }
 
   // File.
   const isFileInput = inputType === 'file'
@@ -81,6 +70,7 @@ const dealWithVModel = (key: string, config: {
   }
 
   // Others are treated as text fields.
+
   vNodeData.attrs['data-ime-start'] = false
   vNodeData.domProps.value = vModelBinding.value
   vNodeData.on.input = (event: Event) => {
@@ -103,5 +93,5 @@ const dealWithVModel = (key: string, config: {
 }
 
 export {
-  dealWithVModel
+  dealWithVModelComposition
 }

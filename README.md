@@ -1,5 +1,7 @@
 # Vue 2 JSX Runtime
 
+![Testing](https://github.com/LancerComet/vue2-jsx-runtime/actions/workflows/Test/badge.svg)
+
 This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to convert Vue 2 JSX.
 
 ## What's the different between this and Vue official solution?
@@ -13,10 +15,6 @@ JSX -> Babel -> Vite (ESBuild) / TSC / SWC -> JS
 The Babel just slows down the whole process, and we all know that these compilers actually support JSX transforming out of box. So if we have a Vue 2 JSX transformer for these compilers, we can just get rid of Babel.
 
 Fortunately, TSC and SWC support using `jsxImportSource` to decide which JSX factory module we gonna use. So if you use this package, you will be able to use Vue 2 JSX without Babel.
-
-## Something you might know
-
-This library is mainly designed for whom uses Composition API and TSX together, so if you are using render function with JSX, you will find that something might be broken like `v-model`.
 
 ## Setup
 
@@ -46,6 +44,10 @@ const Example = defineComponent({
 })
 ```
 
+Due to limitations, using ref is a little different form to Vue 3.
+
+You can check [this](https://github.com/vuejs/composition-api#limitations) out for more information.
+
 ### Slot
 
 ```tsx
@@ -69,28 +71,20 @@ const Example = defineComponent({
     )
   }
 })
-
-const wrapper = mount(defineComponent({
-  setup () {
-    return () => (
-      <Container>
-        <Example>Default</Example>
-        <Example slot='slot1'>Slot1</Example>
-        <Example slot='slot2'>Slot2</Example>
-      </Container>
-    )
-  }
-}))
 ```
 
-Due to limitations, using ref is a little different form to Vue 3.
-
-You can check [this](https://github.com/vuejs/composition-api#limitations) out for more information.
+```tsx
+<Container>
+  <Example>Default</Example>
+  <Example slot='slot1'>Slot1</Example>
+  <Example slot='slot2'>Slot2</Example>
+</Container>
+```
 
 ### ScopedSlots
 
 ```tsx
-const Container = defineComponent({
+const MyComponent = defineComponent({
   props: {
     name: String as PropType<string>,
     age: Number as PropType<number>
@@ -106,24 +100,20 @@ const Container = defineComponent({
     )
   }
 })
+```
 
-const wrapper = mount(defineComponent({
-  setup () {
-    return () => (
-      <Container
-        name='John Smith'
-        age={100}
-        scopedSlots={{
-          default: () => <div>Default</div>,
-          nameSlot: (name: string) => <div>Name: {name}</div>,
-          ageSlot: (age: number) => {
-            return <div>Age: {age}</div>
-          }
-        }}
-      />
-    )
-  }
-}))
+```tsx
+<MyComponent
+  name='John Smith'
+  age={100}
+  scopedSlots={{
+    default: () => <div>Default</div>,
+    nameSlot: (name: string) => <div>Name: {name}</div>,
+    ageSlot: (age: number) => {
+      return <div>Age: {age}</div>
+    }
+  }}
+/>
 ```
 
 Output:
@@ -163,23 +153,37 @@ Native is only available for Vue components.
 
 ### v-model
 
+It only supports using `v-model` on **HTML elements**, for now you cannot use v-model on Vue component. So please use `value` and `onUpdate` separately.
+
+#### Using composition API
+
 ```tsx
 import ref from '@vue/composition-api'
 
 const Example = defineComponent({
   setup (_, { refs }) {
-    const userInputRef = ref('')
-
+    const nameRef = ref('')
     return () => (
       <div>
-        <input v-model={userInputRef}/>
+        <input v-model={nameRef}/>
       </div>
     )
   }
 })
 ```
 
-It only supports using `v-model` on **HTML elements**, for now you cannot use v-model on Vue component. So please use `value` and `onUpdate` separately.
+#### Using render function
+
+```tsx
+import Vue from 'vue'
+
+const Example = Vue.extend({
+  data: () => ({
+    name: ''
+  }),
+  render: () => <input v-model='name'/>
+})
+```
 
 ### Fragment (experimental)
 
