@@ -11,10 +11,6 @@ const Fragment = {
   name: 'Fragment',
 
   props: {
-    name: {
-      type: String,
-      default: () => Math.floor(Date.now() * Math.random()).toString(16)
-    },
     html: {
       type: String,
       default: null
@@ -28,8 +24,8 @@ const Fragment = {
     container.__isFragment = true
     container.__isMounted = false
 
-    const head = document.createComment(`fragment#${this.name}#head`)
-    const tail = document.createComment(`fragment#${this.name}#tail`)
+    const head = document.createComment('fragment#head')
+    const tail = document.createComment('fragment#tail')
 
     container.__head = head
     container.__tail = tail
@@ -80,7 +76,7 @@ const Fragment = {
     if (children && children.length) {
       // eslint-disable-next-line no-return-assign
       children.forEach(child =>
-        child.data = { ...child.data, attrs: { fragment: this.name, ...(child.data || {}).attrs } }
+        child.data = { ...child.data, attrs: { ...(child.data || {}).attrs } }
       )
     }
 

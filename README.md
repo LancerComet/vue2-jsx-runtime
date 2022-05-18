@@ -1,8 +1,6 @@
 # Vue 2 JSX Runtime
 
-## What does it do?
-
-This is a package for handling Vue 2 JSX code, you can use it with your favourite toolchain like SWC, TSC, Vite* to convert Vue 2 JSX.
+This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to convert Vue 2 JSX.
 
 ## What's the different between this and Vue official solution?
 
@@ -16,14 +14,209 @@ The Babel just slows down the whole process, and we all know that these compiler
 
 Fortunately, TSC and SWC support using `jsxImportSource` to decide which JSX factory module we gonna use. So if you use this package, you will be able to use Vue 2 JSX without Babel.
 
-## Quick start
+## Something you might know
+
+This library is mainly designed for whom uses Composition API and TSX together, so if you are using render function with JSX, you will find that something might be broken like `v-model`.
+
+## Setup
 
 TODO: ...
 
+## Usage
+
+### HTML / Component ref
+
+```tsx
+import { ComponentPublicInstance, defineComponent, onMounted } from '@vue/composition-api'
+
+const Example = defineComponent({
+  setup (_, { refs }) {
+    onMounted(() => {
+      const div = refs.doge as HTMLElement
+      const example = refs.example as ComponentPublicInstance<any>
+    })
+
+    return () => (
+      <div>
+        <div ref='doge'>Wow very doge</div>
+        <Example ref='example'/>
+      </div>
+    )
+  }
+})
+```
+
+### Slot
+
+```tsx
+const Container = defineComponent({
+  setup (_, { slots }) {
+    return () => (
+      <div>
+        { slots.default?.() }
+        { slots.slot1?.() }
+        { slots.slot2?.() }
+      </div>
+    )
+  }
+})
+
+const Example = defineComponent({
+  name: 'Example',
+  setup (_, { slots }) {
+    return () => (
+      <div>{ slots.default?.() }</div>
+    )
+  }
+})
+
+const wrapper = mount(defineComponent({
+  setup () {
+    return () => (
+      <Container>
+        <Example>Default</Example>
+        <Example slot='slot1'>Slot1</Example>
+        <Example slot='slot2'>Slot2</Example>
+      </Container>
+    )
+  }
+}))
+```
+
+Due to limitations, using ref is a little different form to Vue 3.
+
+You can check [this](https://github.com/vuejs/composition-api#limitations) out for more information.
+
+### ScopedSlots
+
+```tsx
+const Container = defineComponent({
+  props: {
+    name: String as PropType<string>,
+    age: Number as PropType<number>
+  },
+
+  setup (props, { slots }) {
+    return () => (
+      <div>
+        { slots.default?.() }
+        { slots.nameSlot?.(props.name) }
+        { slots.ageSlot?.(props.age) }
+      </div>
+    )
+  }
+})
+
+const wrapper = mount(defineComponent({
+  setup () {
+    return () => (
+      <Container
+        name='John Smith'
+        age={100}
+        scopedSlots={{
+          default: () => <div>Default</div>,
+          nameSlot: (name: string) => <div>Name: {name}</div>,
+          ageSlot: (age: number) => {
+            return <div>Age: {age}</div>
+          }
+        }}
+      />
+    )
+  }
+}))
+```
+
+Output:
+
+```html
+<div>
+  <div>Default</div>
+  <div>Name: John Smith</div>
+  <div>Age: 100</div>
+</div>
+```
+
+### On
+
+```tsx
+// Evenet handler on HTML element.
+<button onClick={onClick}>Click me</button>
+
+// Event handler on Vue component.
+<MyComponent onTrigger={onTrigger} />
+
+// Using "on" to assign multiple events for once.
+<div on={{
+  click: onClick,
+  focus: onFocus,
+  blur: onBlur
+}}></div>
+```
+
+### Native on
+
+```tsx
+<MyComponent onClick:native={onClick} />
+```
+
+Native is only available for Vue components.
+
+### v-model
+
+```tsx
+import ref from '@vue/composition-api'
+
+const Example = defineComponent({
+  setup (_, { refs }) {
+    const userInputRef = ref('')
+
+    return () => (
+      <div>
+        <input v-model={userInputRef}/>
+      </div>
+    )
+  }
+})
+```
+
+It only supports using `v-model` on **HTML elements**, for now you cannot use v-model on Vue component. So please use `value` and `onUpdate` separately.
+
+### Fragment (experimental)
+
+Vue 2 doesn't come with fragment support so this feature is supported by [vue-fragment](https://github.com/Thunberg087/vue-fragment) under the hood:
+
+```tsx
+<div>
+  <>
+    <h1>Wow such a fragment</h1>
+    <small>I can smell it</small>
+  </>
+</div>
+```
+
+This will be rendered as
+
+```html
+<div>
+  <!--fragment#head-->
+  <h1>Wow such a fragment</h1>
+  <small>I can smell it</small>
+  <!--fragment#tail-->
+</div>
+```
+
 ## For Vite users
 
-For Vite users, it's better to use TSC or SWC instead of built-in ESBuild. Because ESBuild is kinda finicky at handling JSX for now and it gives you no rooms to change its configuration.
+For Vite users, it's better to use TSC or SWC instead of built-in ESBuild. Because ESBuild is very finicky at handling JSX for now, and it gives you no room to change its behavior.
 
 For faster compilation, SWC is recommended. You can use [unplugin-swc](https://github.com/egoist/unplugin-swc) to make Vite uses SWC.
 
-Once you have switched to SWC (TSC) from ESBuild, you will have ability to use this package, and surprisingly you can get more, like `emitDecoratorMetadata` which is not supported by ESBuild. And SWC is still darn fast.
+Once you have switched to SWC (TSC) from ESBuild, you will not only be able to use this package, but also get more features like `emitDecoratorMetadata` which is not supported by ESBuild, and the whole process is still darn fast.
+
+## References
+
+ - [Introducing the New JSX Transform](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html)
+ - [Render Function](https://vuejs.org/guide/extras/render-function.html)
+ - [vue-jsx-runtime (Vue 3)](https://github.com/dolymood/vue-jsx-runtime)
+ - [@vue/composition-api](https://github.com/vuejs/composition-api)
+ - [@vue/babel-plugin-jsx](https://github.com/vuejs/babel-plugin-jsx)

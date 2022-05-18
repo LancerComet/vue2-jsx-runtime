@@ -1,29 +1,27 @@
-import { h } from '@vue/composition-api'
+import { h, Ref } from '@vue/composition-api'
 import { VNode, VNodeChildren, VNodeData } from 'vue'
 import { AsyncComponent, Component } from 'vue/types/options'
-import camelCase from 'camelcase'
-
-const domProps = [
-  'value', 'innerHTML', 'innerText', 'textContent'
-]
-
-const ON_EVENT_REGEXP = /^on/
-const HTML_TAG_REGEXP = /^[\da-z]+$/
-
-const isArray = (target: unknown): target is any[] => Array.isArray(target)
-// const isObject = (target: unknown): target is object => typeof target === 'object'
-const isString = (target: unknown): target is string => typeof target === 'string'
-const isUndefined = (target: unknown): target is undefined => typeof target === 'undefined'
-// const isFunction = (target: unknown): target is (...args: any[]) => any => typeof target === 'function'
-const checkIsHTMLElement = (tag: unknown) => isString(tag) && HTML_TAG_REGEXP.test(tag)
-const checkKeyIsClass = (key: string) => key === 'class'
-const checkKeyIsChildren = (key: string) => key === 'children'
-const checkKeyIsStyle = (key: string) => key === 'style'
-const checkKeyIsDomProps = (key: string) => domProps.includes(key)
-const checkKeyIsOnEvent = (key: string) => ON_EVENT_REGEXP.test(key)
-const checkKeyIsOnObject = (key: string) => key === 'on'
-const checkKeyIsSlot = (key: string) => key === 'slot'
-const checkIsScopedSlots = (key: string) => key === 'scopedSlots'
+import {
+  checkKeyIsDirective,
+  checkIsHTMLElement,
+  checkKeyIsNativeOn,
+  checkKeyIsChildren,
+  checkKeyIsClass,
+  checkKeyIsDomProps,
+  checkKeyIsKey,
+  checkKeyIsOnEvent,
+  checkKeyIsOnObject,
+  checkKeyIsScopedSlots,
+  checkKeyIsSlot,
+  checkKeyIsStyle,
+  checkKeyIsVModel,
+  isArray,
+  isUndefined,
+  removeNativeOn,
+  removeOn, checkKeyIsRef
+} from './utils'
+import { Fragment } from './fragment'
+import { dealWithVModel } from './v-model'
 
 const jsx = (
   tag: string | Component<any, any, any, any> | AsyncComponent<any, any, any, any> | (() => Component),
@@ -35,10 +33,6 @@ const jsx = (
   // Reference:
   // https://cn.vuejs.org/v2/guide/render-function.html
 
-  // I treat every lowercase string as HTML element.
-  // Because in JSX Vue component should be (Upper) CamelCase named.
-  const isHTMLElement = checkIsHTMLElement(tag)
-
   // Deal with vNodeData.
   const vNodeData: VNodeData = {
     attrs: {},
@@ -46,6 +40,19 @@ const jsx = (
     domProps: {},
     on: {}
   }
+
+  const isFragment = isUndefined(tag) && config.children
+  if (isFragment) {
+    return h(
+      Fragment,
+      vNodeData,
+      isArray(config.children) ? config.children : [config.children]
+    )
+  }
+
+  // I treat every lowercase string as HTML element.
+  // Because in JSX Vue component should be (Upper) CamelCase named.
+  const isHTMLElement = checkIsHTMLElement(tag)
 
   const attrKeys = Object.keys(config)
   for (const key of attrKeys) {
@@ -55,6 +62,11 @@ const jsx = (
     }
 
     const value = config[key]
+
+    if (checkKeyIsKey(key)) {
+      vNodeData.key = value
+      continue
+    }
 
     // Deal with class and style.
     // Everything now is thrown to reactive class/style because I can't tell the difference
@@ -79,9 +91,16 @@ const jsx = (
       continue
     }
 
+    if (checkKeyIsNativeOn(key) && !isHTMLElement) {
+      const _key = removeNativeOn(key)
+      vNodeData.nativeOn = vNodeData.nativeOn || {}
+      vNodeData.nativeOn[_key] = value
+      continue
+    }
+
     if (checkKeyIsOnEvent(key)) {
-      const keyWithoutOn = camelCase(key.replace(ON_EVENT_REGEXP, ''))
-      vNodeData.on[keyWithoutOn] = value
+      const _key = removeOn(key)
+      vNodeData.on[_key] = value
       continue
     }
 
@@ -90,8 +109,24 @@ const jsx = (
       continue
     }
 
-    if (checkIsScopedSlots(key)) {
+    if (checkKeyIsScopedSlots(key)) {
       vNodeData.scopedSlots = value
+      continue
+    }
+
+    // Deal with input v-model with HTML Input.
+    if (tag === 'input' && checkKeyIsVModel(key)) {
+      dealWithVModel(key, config, vNodeData)
+      continue
+    }
+
+    if (checkKeyIsRef(key)) {
+      vNodeData.ref = value
+      continue
+    }
+
+    if (checkKeyIsDirective(key)) {
+      // TODO: ...
       continue
     }
 
@@ -108,7 +143,7 @@ const jsx = (
   // @ts-ignore
   return h(
     isJsxsFunc
-      ? { setup: () => tag } // JSXS function should wrap into setup function.
+      ? { setup: () => tag } // JSXS function should be wrapped into setup function.
       : tag,
     vNodeData,
     // Seems like it's a bug right here, it must be an array, but it claimed that it shouldn't have to.
