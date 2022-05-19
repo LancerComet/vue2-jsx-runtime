@@ -1,7 +1,7 @@
 import type { VNodeChildren, VNodeData, VNodeDirective } from 'vue'
 import type { Ref } from '@vue/composition-api'
 import { paramCase } from 'change-case'
-import { checkIsRefObj, isString } from '../utils'
+import { checkIsRefObj, isBoolean, isNumber, isString } from '../utils'
 import { getCurrentInstance } from '../runtime'
 
 // v-xxx-xxx:a.b.c => {
@@ -40,6 +40,10 @@ const getDirValue = (directiveRawValue: string | Ref<string>) => {
     return directiveRawValue.value
   }
 
+  if (isBoolean(directiveRawValue) || isNumber(directiveRawValue)) {
+    return directiveRawValue
+  }
+
   const isVariableName = /^[a-zA-Z_$]([\d\w$]+)?$/.test(directiveRawValue)
   if (isVariableName) {
     const vm = getCurrentInstance()
@@ -51,7 +55,7 @@ const getDirValue = (directiveRawValue: string | Ref<string>) => {
     return floatValue
   }
 
-  // Array, function, object, ect.
+  // Array, function, object, null, undefined, ect.
   return directiveRawValue
 }
 

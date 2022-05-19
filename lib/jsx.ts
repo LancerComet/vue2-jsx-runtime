@@ -1,4 +1,5 @@
 import type { VNode, VNodeData } from 'vue'
+import { camelCase } from 'change-case'
 import {
   checkKeyIsVueDirective,
   checkIsHTMLElement,
@@ -23,6 +24,9 @@ import { dealWithVModel } from './modules/v-model'
 import { dealWithDirective } from './modules/directive'
 import { ConfigType, TagType } from './type'
 import { getCurrentInstance } from './runtime'
+
+const V_ON_REGEXP = /^v(O|-o)n:/
+const V_BIND_REGEXP = /^v(-b|B)ind:/
 
 // Reference:
 // https://cn.vuejs.org/v2/guide/render-function.html
@@ -54,10 +58,20 @@ const jsx = function (
   const isHTMLElement = checkIsHTMLElement(tag)
 
   const attrKeys = Object.keys(config)
-  for (const key of attrKeys) {
+  for (let key of attrKeys) {
     // Children shouldn't be set in vNodeData.
     if (checkKeyIsChildren(key)) {
       continue
+    }
+
+    // Transform v-on:xx or vOn:xx to onXx.
+    if (V_ON_REGEXP.test(key)) {
+      key = camelCase(key.replace(V_ON_REGEXP, 'on-'))
+    }
+
+    // Transform v-bind:xx to xx.
+    if (V_BIND_REGEXP.test(key)) {
+      key = key.replace(V_BIND_REGEXP, '')
     }
 
     const value = config[key]
@@ -80,7 +94,7 @@ const jsx = function (
       continue
     }
 
-    if (checkKeyIsDomProps(key)) {
+    if (checkKeyIsDomProps(key) && isHTMLElement) {
       vNodeData.domProps[key] = value
       continue
     }
@@ -99,7 +113,7 @@ const jsx = function (
 
     if (checkKeyIsOnEvent(key)) {
       const _key = removeOn(key)
-      vNodeData.on[_key] = value
+      vNodeData.on[_key] = value || noop
       continue
     }
 
@@ -152,3 +166,5 @@ const jsx = function (
 export {
   jsx
 }
+
+function noop () {}
