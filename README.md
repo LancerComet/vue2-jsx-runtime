@@ -22,12 +22,45 @@ TODO: ...
 
 ## Usage
 
+### On event
+
+```tsx
+// Evenet handler on HTML element.
+<button onClick={onClick}>Click me</button>
+
+// Event handler on Vue component.
+<MyComponent onTrigger={onTrigger} />
+
+// Using "on" to assign multiple events for once.
+<div on={{
+  click: onClick,
+  focus: onFocus,
+  blur: onBlur
+}}></div>
+```
+
+### Native on
+
+```tsx
+<MyComponent onClick:native={onClick} />
+```
+
+Native is only available for Vue components.
+
 ### HTML / Component ref
 
 ```tsx
 import { ComponentPublicInstance, defineComponent, onMounted } from '@vue/composition-api'
 
 const Example = defineComponent({
+  setup () {
+    return () => (
+      <div>Example goes here</div>
+    )
+  }
+})
+
+const Wrapper = defineComponent({
   setup (_, { refs }) {
     onMounted(() => {
       const div = refs.doge as HTMLElement
@@ -125,31 +158,6 @@ Output:
   <div>Age: 100</div>
 </div>
 ```
-
-### On
-
-```tsx
-// Evenet handler on HTML element.
-<button onClick={onClick}>Click me</button>
-
-// Event handler on Vue component.
-<MyComponent onTrigger={onTrigger} />
-
-// Using "on" to assign multiple events for once.
-<div on={{
-  click: onClick,
-  focus: onFocus,
-  blur: onBlur
-}}></div>
-```
-
-### Native on
-
-```tsx
-<MyComponent onClick:native={onClick} />
-```
-
-Native is only available for Vue components.
 
 ### v-model
 

@@ -1,6 +1,5 @@
-import { h, isRef } from '@vue/composition-api'
-import { VNode, VNodeChildren, VNodeData } from 'vue'
-import { AsyncComponent, Component } from 'vue/types/options'
+import { h } from '@vue/composition-api'
+import { VNode, VNodeData } from 'vue'
 import {
   checkKeyIsVueDirective,
   checkIsHTMLElement,

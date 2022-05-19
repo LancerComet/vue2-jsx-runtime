@@ -18,6 +18,23 @@ const dealWithVModel = (
   vNodeData: VNodeData,
   isHTMLElement: boolean
 ) => {
+  const bindingExpression = config[key] as vModelBinding
+  let bindingTarget: string | Ref<unknown>
+  // let argument: string | undefined
+  let modifiers: string[] = []
+
+  if (isString(bindingExpression) || isRef(bindingExpression)) {
+    bindingTarget = bindingExpression
+  } else if (isArray(bindingExpression)) {
+    bindingTarget = bindingExpression[0]
+    if (bindingExpression.length === 2) {
+      modifiers = bindingExpression[1]
+    } else if (bindingExpression.length === 3) {
+      // argument = bindingExpression[1]
+      modifiers = bindingExpression[2]
+    }
+  }
+
   if (checkIsInputOrTextarea(tag)) {
     const isInput = tag === 'input'
     const inputType = config.type // 'file', 'text', 'number', .ect.
@@ -26,23 +43,6 @@ const dealWithVModel = (
     const isSkippedInput = /button|submit|reset/.test(inputType)
     if (isSkippedInput) {
       return
-    }
-
-    const bindingExpression = config[key] as vModelBinding
-    let bindingTarget: string | Ref<unknown>
-    let argument: string | undefined
-    let modifiers: string[] = []
-
-    if (isString(bindingExpression) || isRef(bindingExpression)) {
-      bindingTarget = bindingExpression
-    } else if (isArray(bindingExpression)) {
-      bindingTarget = bindingExpression[0]
-      if (bindingExpression.length === 2) {
-        modifiers = bindingExpression[1]
-      } else if (bindingExpression.length === 3) {
-        argument = bindingExpression[1]
-        modifiers = bindingExpression[2]
-      }
     }
 
     const instance = getCurrentInstance()
@@ -128,7 +128,13 @@ const dealWithVModel = (
     const isLazyInput = modifiers.includes('lazy')
     const emitValue = (value: string) => {
       const hasNumberModifier = modifiers.includes('number')
-      const newValue = hasNumberModifier ? parseFloat(value) : value
+      const hasTrimModifier = modifiers.includes('trim')
+      const newValue = hasNumberModifier
+        ? parseFloat(value)
+        : hasTrimModifier
+          ? value.trim()
+          : value
+
       if (isString(bindingTarget)) {
         vueComp[bindingTarget] = newValue
       } else {

@@ -1,8 +1,9 @@
 /* eslint-disable no-undef */
 
-import { getDirectiveInfo } from '../lib/modules/directive'
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
+import Vue from 'vue'
+import { getDirectiveInfo } from '../lib/modules/directive'
 import { sleep } from './utils/sleep'
 
 describe('Directive testing.', () => {
@@ -48,7 +49,7 @@ describe('Directive testing.', () => {
     })
   })
 
-  it('v-show should work properly.', async () => {
+  it('v-show should work properly (Ref).', async () => {
     const isDisplayRef = ref(true)
     const Example = defineComponent({
       setup () {
@@ -61,6 +62,19 @@ describe('Directive testing.', () => {
     expect(wrapper.isVisible()).toBe(true)
 
     isDisplayRef.value = false
+    await sleep(10)
+    expect(wrapper.isVisible()).toBe(false)
+  })
+
+  it('v-show should work properly (template).', async () => {
+    const Example = Vue.extend({
+      data: () => ({ isDisplay: true }),
+      render: () => <div v-show='isDisplay'>Wow</div>
+    })
+    const wrapper = shallowMount(Example)
+    expect(wrapper.isVisible()).toBe(true)
+
+    wrapper.vm.isDisplay = false
     await sleep(10)
     expect(wrapper.isVisible()).toBe(false)
   })

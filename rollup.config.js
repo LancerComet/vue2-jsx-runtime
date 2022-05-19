@@ -7,11 +7,11 @@ export default {
 
   output: [
     {
-      file: './dist/index.js',
+      file: './dist/jsx-runtime.js',
       format: 'commonjs'
     },
     {
-      file: './dist/index.esm.js',
+      file: './dist/jsx-runtime.mjs',
       format: 'es'
     }
   ],
