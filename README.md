@@ -18,7 +18,56 @@ Fortunately, TSC and SWC support using `jsxImportSource` to decide which JSX fac
 
 ## Setup
 
-TODO: ...
+First please make sure `Vue@2` has been installed in your project, then
+
+```
+npm install @lancercomet/vue2-jsx-runtime --save-dev
+```
+
+### TSC
+
+Update your `tsconfig.json` with:
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "jsx": "react-jsx",  // Please set to "react-jsx". 
+    "jsxImportSource": "@lancercomet/vue2-jsx-runtime"  // Please set to package name.
+  }
+}
+```
+
+> The reason why "jsx" should be set to "react-jsx" is this plugin matches the new JSX transform.
+
+### SWC
+
+In `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    ...
+    "jsx": "preserve"  // Please set to "preserve". 
+  }
+}
+```
+
+And in `.swcrc`:
+
+```json
+{
+  "jsc": {
+    "transform": {
+      "react": {
+        "runtime": "automatic",  // Please set to "automatic" to enable new JSX transform.
+        "importSource": "@lancercomet/vue2-jsx-runtime",  // Please set to package name.
+        "throwIfNamespace": false
+      }
+    }
+  }
+}
+```
 
 ## Usage
 
