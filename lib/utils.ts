@@ -12,7 +12,9 @@ const NATIVE_ON_REGEXP = /:native$/
 
 const isArray = (target: unknown): target is any[] => Array.isArray(target)
 const isBoolean = (target: unknown): target is boolean => typeof target === 'symbol'
-const isObject = (target: unknown): target is object => typeof target === 'object'
+const isObject = (target: unknown): target is object => {
+  return typeof target === 'object' && !isArray(target) && target !== null
+}
 const isString = (target: unknown): target is string => typeof target === 'string'
 const isUndefined = (target: unknown): target is undefined => typeof target === 'undefined'
 const isFunction = (target: unknown): target is (...args: any[]) => any => typeof target === 'function'
@@ -32,6 +34,13 @@ const checkKeyIsVModel = (key: string): key is 'v-model' | 'vModel' => /^v(-m|M)
 const checkKeyIsVueDirective = (key: string) => /^v/.test(key)
 const checkKeyIsRef = (key: string) => key === 'ref'
 const checkIsInputOrTextarea = (target: unknown): target is 'input' | 'textarea' => target === 'input' || target === 'textarea'
+
+// The reason why I don't use "isRef" which is provided by @vue/composition-api is that
+// this function will be broken under SWC.
+// In this case, we only need to check whether it is an object.
+const checkIsRefObj = (target: any): target is { value: unknown } => {
+  return isObject(target) && Object.keys(target).includes('value')
+}
 
 // onClick -> click
 const removeOn = (key: string) => camelCase(key.replace(ON_EVENT_REGEXP, ''))
@@ -62,6 +71,7 @@ export {
   checkKeyIsKey,
   checkKeyIsNativeOn,
   checkKeyIsRef,
+  checkIsRefObj,
 
   checkKeyIsVModel,
   checkKeyIsVueDirective,

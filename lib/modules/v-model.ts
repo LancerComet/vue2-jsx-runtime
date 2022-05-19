@@ -1,7 +1,8 @@
-import { checkIsInputOrTextarea, isArray, isString, isUndefined } from '../utils'
-import { getCurrentInstance, isRef, Ref } from '@vue/composition-api'
-import { VNodeData } from 'vue'
+import { checkIsInputOrTextarea, checkIsRefObj, isArray, isString, isUndefined } from '../utils'
+import type { Ref } from '@vue/composition-api'
+import type { VNodeData } from 'vue'
 import { ConfigType, TagType } from '../type'
+import { getCurrentInstance } from '../runtime'
 
 const IME_START_KEY = '__ime_start__'
 
@@ -23,7 +24,7 @@ const dealWithVModel = (
   // let argument: string | undefined
   let modifiers: string[] = []
 
-  if (isString(bindingExpression) || isRef(bindingExpression)) {
+  if (isString(bindingExpression) || checkIsRefObj(bindingExpression)) {
     bindingTarget = bindingExpression
   } else if (isArray(bindingExpression)) {
     bindingTarget = bindingExpression[0]
@@ -46,7 +47,6 @@ const dealWithVModel = (
     }
 
     const instance = getCurrentInstance()
-    const vueComp = instance.proxy
 
     // File.
     const isFileInput = isInput && inputType === 'file'
@@ -59,12 +59,12 @@ const dealWithVModel = (
     const isRadioInput = isInput && inputType === 'radio'
     if (isRadioInput) {
       vNodeData.domProps.checked = isString(bindingTarget)
-        ? vueComp[bindingTarget] === config.value
+        ? instance[bindingTarget] === config.value
         : bindingTarget.value === config.value
       vNodeData.on.change = (event: Event) => {
         const target = event.target as HTMLInputElement
         if (isString(bindingTarget)) {
-          vueComp[bindingTarget] = target.value
+          instance[bindingTarget] = target.value
         } else {
           bindingTarget.value = target.value
         }
@@ -95,7 +95,7 @@ const dealWithVModel = (
           const isValueSpecified = !isUndefined(config.value)
           const newCheckStatus = !target.checked
           if (isString(bindingTarget)) {
-            vueComp[bindingTarget] = isValueSpecified
+            instance[bindingTarget] = isValueSpecified
               ? target.value
               : newCheckStatus ? checkboxDefaultValue : undefined
           } else {
@@ -108,7 +108,7 @@ const dealWithVModel = (
 
       let bindingValue: unknown
       if (isString(bindingTarget)) {
-        bindingValue = vueComp[bindingTarget]
+        bindingValue = instance[bindingTarget]
       } else {
         bindingValue = bindingTarget.value
       }
@@ -136,7 +136,7 @@ const dealWithVModel = (
           : value
 
       if (isString(bindingTarget)) {
-        vueComp[bindingTarget] = newValue
+        instance[bindingTarget] = newValue
       } else {
         bindingTarget.value = newValue
       }
@@ -144,7 +144,7 @@ const dealWithVModel = (
 
     vNodeData.attrs[IME_START_KEY] = false
     vNodeData.domProps.value = isString(bindingTarget)
-      ? vueComp[bindingTarget]
+      ? instance[bindingTarget]
       : bindingTarget.value
     vNodeData.on.input = (event: Event) => {
       if (

@@ -37,6 +37,6 @@ export default {
 
   external: [
     'change-case',
-    '@vue/composition-api'
+    'vue'
   ]
 }

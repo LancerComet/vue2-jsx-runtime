@@ -1,5 +1,4 @@
-import { h } from '@vue/composition-api'
-import { VNode, VNodeData } from 'vue'
+import type { VNode, VNodeData } from 'vue'
 import {
   checkKeyIsVueDirective,
   checkIsHTMLElement,
@@ -23,13 +22,15 @@ import { Fragment } from './modules/fragment'
 import { dealWithVModel } from './modules/v-model'
 import { dealWithDirective } from './modules/directive'
 import { ConfigType, TagType } from './type'
+import { getCurrentInstance } from './runtime'
 
-const jsx = (
+// Reference:
+// https://cn.vuejs.org/v2/guide/render-function.html
+const jsx = function (
   tag: TagType,
   config: ConfigType = {}
-): VNode => {
-  // Reference:
-  // https://cn.vuejs.org/v2/guide/render-function.html
+): VNode {
+  const h = getCurrentInstance().$createElement
 
   // Deal with vNodeData.
   const vNodeData: VNodeData = {
@@ -139,13 +140,11 @@ const jsx = (
   // Check is JSXS function.
   const isJsxsFunc = typeof tag === 'function' && isUndefined((tag as any).cid)
 
-  // @ts-ignore
   return h(
-    isJsxsFunc
-      ? { setup: () => tag } // JSXS function should be wrapped into setup function.
-      : tag,
+    // JSXS function should be wrapped.
+    // @ts-ignore
+    isJsxsFunc ? { render: tag } : tag,
     vNodeData,
-    // Seems like it's a bug right here, it must be an array, but it claimed that it shouldn't have to.
     isArray(config.children) ? config.children : [config.children]
   )
 }

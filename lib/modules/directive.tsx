@@ -1,7 +1,8 @@
-import { VNodeChildren, VNodeData, VNodeDirective } from 'vue'
-import { getCurrentInstance, isRef, Ref } from '@vue/composition-api'
+import type { VNodeChildren, VNodeData, VNodeDirective } from 'vue'
+import type { Ref } from '@vue/composition-api'
 import { paramCase } from 'change-case'
-import { isString } from '../utils'
+import { checkIsRefObj, isString } from '../utils'
+import { getCurrentInstance } from '../runtime'
 
 // v-xxx-xxx:a.b.c => {
 //   name: 'xxx-xxx',
@@ -35,14 +36,13 @@ const getDirectiveInfo = (key: string) => {
 }
 
 const getDirValue = (directiveRawValue: string | Ref<string>) => {
-  if (isRef(directiveRawValue)) {
+  if (checkIsRefObj(directiveRawValue)) {
     return directiveRawValue.value
   }
 
   const isVariableName = /^[a-zA-Z_$]([\d\w$]+)?$/.test(directiveRawValue)
   if (isVariableName) {
-    const instance = getCurrentInstance()
-    const vm = instance.proxy
+    const vm = getCurrentInstance()
     return vm[directiveRawValue]
   }
 

@@ -33,7 +33,7 @@ describe('v-model IME testing.', () => {
   })
 
   it('Direct mode should work properly when using IME.', async () => {
-    const userInputRef = ref('')
+    const userInputRef = ref()
 
     const Example = defineComponent({
       setup () {

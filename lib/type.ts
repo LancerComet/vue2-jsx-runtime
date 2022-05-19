@@ -1,5 +1,5 @@
 import { AsyncComponent, Component } from 'vue/types/options'
-import { VNodeChildren } from 'vue'
+import type { VNodeChildren } from 'vue'
 
 type TagType = string | Component<any, any, any, any> | AsyncComponent<any, any, any, any> | (() => Component)
 
