@@ -28,7 +28,7 @@ npm install @lancercomet/vue2-jsx-runtime --save-dev
 
 Update your `tsconfig.json` with:
 
-```json
+```js
 {
   "compilerOptions": {
     ...
@@ -44,7 +44,7 @@ Update your `tsconfig.json` with:
 
 In `tsconfig.json`:
 
-```json
+```js
 {
   "compilerOptions": {
     ...
@@ -55,7 +55,7 @@ In `tsconfig.json`:
 
 And in `.swcrc`:
 
-```json
+```js
 {
   "jsc": {
     "transform": {
