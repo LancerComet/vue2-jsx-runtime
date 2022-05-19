@@ -1,5 +1,6 @@
 # Vue 2 JSX Runtime
 
+[![npm version](https://badge.fury.io/js/@lancercomet%2Fvue2-jsx-runtime.svg)](https://badge.fury.io/js/@lancercomet%2Fvue2-jsx-runtime)
 ![Testing](https://github.com/LancerComet/vue2-jsx-runtime/workflows/Test/badge.svg)
 
 This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to convert Vue 2 JSX.
@@ -21,7 +22,7 @@ Fortunately, TSC and SWC support using `jsxImportSource` to decide which JSX fac
 First please make sure `Vue@2` has been installed in your project, then
 
 ```
-npm install @lancercomet/vue2-jsx-runtime --save-dev
+npm install @lancercomet/vue2-jsx-runtime --save
 ```
 
 ### TSC
