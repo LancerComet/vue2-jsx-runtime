@@ -1,4 +1,4 @@
-import camelCase from 'camelcase'
+import { camelCase } from 'change-case'
 
 const domProps = [
   'value', 'defaultValue',
@@ -16,6 +16,7 @@ const isObject = (target: unknown): target is object => typeof target === 'objec
 const isString = (target: unknown): target is string => typeof target === 'string'
 const isUndefined = (target: unknown): target is undefined => typeof target === 'undefined'
 const isFunction = (target: unknown): target is (...args: any[]) => any => typeof target === 'function'
+const isNumber = (target: unknown): target is number => typeof target === 'number'
 const checkIsHTMLElement = (tag: unknown) => isString(tag) && HTML_TAG_REGEXP.test(tag)
 const checkKeyIsClass = (key: string) => key === 'class'
 const checkKeyIsChildren = (key: string) => key === 'children'
@@ -27,9 +28,10 @@ const checkKeyIsSlot = (key: string) => key === 'slot'
 const checkKeyIsScopedSlots = (key: string) => key === 'scopedSlots'
 const checkKeyIsKey = (key: string) => key === 'key'
 const checkKeyIsNativeOn = (key: string) => NATIVE_ON_REGEXP.test(key)
-const checkKeyIsVModel = (key: string) => /^v(-m|M)odel(:[\d\w]+)?$/.test(key)
-const checkKeyIsDirective = (key: string) => /^v/.test(key)
+const checkKeyIsVModel = (key: string): key is 'v-model' | 'vModel' => /^v(-m|M)odel$/.test(key)
+const checkKeyIsVueDirective = (key: string) => /^v/.test(key)
 const checkKeyIsRef = (key: string) => key === 'ref'
+const checkIsInputOrTextarea = (target: unknown): target is 'input' | 'textarea' => target === 'input' || target === 'textarea'
 
 // onClick -> click
 const removeOn = (key: string) => camelCase(key.replace(ON_EVENT_REGEXP, ''))
@@ -47,6 +49,7 @@ export {
   isString,
   isUndefined,
   isFunction,
+  isNumber,
   checkIsHTMLElement,
   checkKeyIsClass,
   checkKeyIsChildren,
@@ -61,7 +64,8 @@ export {
   checkKeyIsRef,
 
   checkKeyIsVModel,
-  checkKeyIsDirective,
+  checkKeyIsVueDirective,
+  checkIsInputOrTextarea,
 
   removeOn,
   removeNativeOn

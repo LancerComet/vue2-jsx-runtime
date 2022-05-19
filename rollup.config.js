@@ -36,7 +36,7 @@ export default {
   ],
 
   external: [
-    'camelcase',
+    'change-case',
     '@vue/composition-api'
   ]
 }

@@ -14,7 +14,6 @@
     "test": "jest",
     "prebuild": "npm run lint",
     "preversion": "npm run build && npm run test",
-    "prepublish": "npm run build && npm run test",
     "postbuild": "node ./post-build.js"
   },
   "author": {
@@ -49,6 +48,6 @@
     "vue": "^2.6.14"
   },
   "dependencies": {
-    "camelcase": "^6.3.0"
+    "change-case": "^4.1.2"
   }
 }

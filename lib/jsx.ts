@@ -1,8 +1,8 @@
-import { h } from '@vue/composition-api'
+import { h, isRef } from '@vue/composition-api'
 import { VNode, VNodeChildren, VNodeData } from 'vue'
 import { AsyncComponent, Component } from 'vue/types/options'
 import {
-  checkKeyIsDirective,
+  checkKeyIsVueDirective,
   checkIsHTMLElement,
   checkKeyIsNativeOn,
   checkKeyIsChildren,
@@ -18,18 +18,16 @@ import {
   isArray,
   isUndefined,
   removeNativeOn,
-  removeOn, checkKeyIsRef, isObject, isString
+  removeOn, checkKeyIsRef
 } from './utils'
-import { Fragment } from './fragment'
-import { dealWithVModelComposition } from './modules/v-model.composition'
-import { dealWithVModelRender } from './modules/v-model.render'
+import { Fragment } from './modules/fragment'
+import { dealWithVModel } from './modules/v-model'
+import { dealWithDirective } from './modules/directive'
+import { ConfigType, TagType } from './type'
 
 const jsx = (
-  tag: string | Component<any, any, any, any> | AsyncComponent<any, any, any, any> | (() => Component),
-  config: {
-    children?: VNodeChildren
-    [props: string]: any
-  } = {}
+  tag: TagType,
+  config: ConfigType = {}
 ): VNode => {
   // Reference:
   // https://cn.vuejs.org/v2/guide/render-function.html
@@ -115,20 +113,9 @@ const jsx = (
       continue
     }
 
-    // Deal with input v-model with HTML Input.
-    if (tag === 'input' && checkKeyIsVModel(key)) {
-      // Skip unsupported input.
-      const inputType = config.type
-      const isSkippedInput = /button|submit|reset/.test(inputType)
-      if (isSkippedInput) {
-        continue
-      }
-
-      if (isString(config[key])) {
-        dealWithVModelRender(key, config, vNodeData)
-      } else if (isObject(config[key])) {
-        dealWithVModelComposition(key, config, vNodeData)
-      }
+    // v-model, vModel.
+    if (checkKeyIsVModel(key)) {
+      dealWithVModel(tag, key, config, vNodeData, isHTMLElement)
       continue
     }
 
@@ -137,8 +124,9 @@ const jsx = (
       continue
     }
 
-    if (checkKeyIsDirective(key)) {
-      // TODO: ...
+    // v-dir, vDir
+    if (checkKeyIsVueDirective(key)) {
+      dealWithDirective(key, vNodeData, config)
       continue
     }
 

@@ -1,6 +1,6 @@
 # Vue 2 JSX Runtime
 
-![Testing](https://github.com/LancerComet/vue2-jsx-runtime/actions/workflows/Test/badge.svg)
+![Testing](https://github.com/LancerComet/vue2-jsx-runtime/workflows/Test/badge.svg)
 
 This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to convert Vue 2 JSX.
 
@@ -155,11 +155,13 @@ Native is only available for Vue components.
 
 It only supports using `v-model` on **HTML elements**, for now you cannot use v-model on Vue component. So please use `value` and `onUpdate` separately.
 
-#### Using composition API
+#### Regular usage
 
 ```tsx
 import ref from '@vue/composition-api'
+import Vue from 'vue'
 
+// In composition API
 const Example = defineComponent({
   setup (_, { refs }) {
     const nameRef = ref('')
@@ -170,19 +172,77 @@ const Example = defineComponent({
     )
   }
 })
-```
 
-#### Using render function
-
-```tsx
-import Vue from 'vue'
-
+// In render function.
 const Example = Vue.extend({
   data: () => ({
     name: ''
   }),
   render: () => <input v-model='name'/>
 })
+```
+
+#### With modifiers
+
+```tsx
+const Example = Vue.extend({
+  data: () => ({
+    name: '',
+    age: 0
+  }),
+  render: () => (
+    <div>
+      <input v-model={['name', ['lazy']]}/>
+      <input v-model={['age', ['number']]}/>
+    </div>
+  )
+})
+
+const Example = defineComponent({
+  setup () {
+    const nameRef = ref('')
+    const ageRef = ref(0)
+    
+    return () => (
+      <div>
+        <input v-model={[nameRef, ['lazy']]}/>
+        <input v-model={[agRef, ['number']]}/>
+      </div>
+    )
+  }
+})
+```
+
+#### With argument
+
+```tsx
+const Example = defineComponent({
+  setup () {
+    const nameRef = ref('')
+    const ageRef = ref(0)
+    
+    return () => (
+      <div>
+        <input v-model={[nameRef, 'value', ['lazy']]}/>
+        <input v-model={[agRef, 'value', ['number']]}/>
+      </div>
+    )
+  }
+})
+```
+
+#### About IME
+
+By default, `v-model` will only assign what you have selected from IME. If you were typing in IME, `v-model` would do nothing.
+
+If you want to disable this behavior, add `direct` modifier:
+
+```tsx
+{/* It will sync everything you have typed in IME. */}
+<input v-model={[userInputRef, ['direct']]}>
+
+{/* By default, it will only assign what you have selected from IME. */}
+<input v-model={userInputRef} >
 ```
 
 ### Fragment (experimental)
