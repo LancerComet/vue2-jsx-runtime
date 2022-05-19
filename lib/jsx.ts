@@ -1,5 +1,4 @@
 import type { VNode, VNodeData } from 'vue'
-import { camelCase } from 'change-case'
 import {
   checkKeyIsVueDirective,
   checkIsHTMLElement,
@@ -25,7 +24,6 @@ import { dealWithDirective } from './modules/directive'
 import { ConfigType, TagType } from './type'
 import { getCurrentInstance } from './runtime'
 
-const V_ON_REGEXP = /^v(O|-o)n:/
 const V_BIND_REGEXP = /^v(-b|B)ind:/
 
 // Reference:
@@ -64,16 +62,6 @@ const jsx = function (
       continue
     }
 
-    // Transform v-on:xx or vOn:xx to onXx.
-    if (V_ON_REGEXP.test(key)) {
-      key = camelCase(key.replace(V_ON_REGEXP, 'on-'))
-    }
-
-    // Transform v-bind:xx to xx.
-    if (V_BIND_REGEXP.test(key)) {
-      key = key.replace(V_BIND_REGEXP, '')
-    }
-
     const value = config[key]
 
     if (checkKeyIsKey(key)) {
@@ -99,6 +87,7 @@ const jsx = function (
       continue
     }
 
+    // on.
     if (checkKeyIsOnObject(key)) {
       vNodeData.on = value
       continue
@@ -111,17 +100,20 @@ const jsx = function (
       continue
     }
 
+    // onInput, v-on:input, vOn:input
     if (checkKeyIsOnEvent(key)) {
       const _key = removeOn(key)
-      vNodeData.on[_key] = value || noop
+      vNodeData.on[_key] = value
       continue
     }
 
+    // slot.
     if (checkKeyIsSlot(key)) {
       vNodeData.slot = value
       continue
     }
 
+    // scopedSlots.
     if (checkKeyIsScopedSlots(key)) {
       vNodeData.scopedSlots = value
       continue
@@ -142,6 +134,11 @@ const jsx = function (
     if (checkKeyIsVueDirective(key)) {
       dealWithDirective(key, vNodeData, config)
       continue
+    }
+
+    // Transform v-bind:xx to xx.
+    if (V_BIND_REGEXP.test(key)) {
+      key = key.replace(V_BIND_REGEXP, '')
     }
 
     if (isHTMLElement) {
@@ -166,5 +163,3 @@ const jsx = function (
 export {
   jsx
 }
-
-function noop () {}

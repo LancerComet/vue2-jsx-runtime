@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+
 import Vue from 'vue'
 import { defineComponent } from '@vue/composition-api'
 import { mount } from '@vue/test-utils'

@@ -6,7 +6,7 @@ const domProps = [
   'src', 'checked'
 ]
 
-const ON_EVENT_REGEXP = /^on/
+const ON_EVENT_REGEXP = /^((v(-o|O)n:)|on)/
 const HTML_TAG_REGEXP = /^[\da-z]+$/
 const NATIVE_ON_REGEXP = /:native$/
 
