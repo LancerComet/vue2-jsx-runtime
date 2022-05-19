@@ -5,6 +5,12 @@ import { setCurrentInstance } from './runtime'
 Vue.mixin({
   beforeCreate () {
     setCurrentInstance(this)
+  },
+  beforeUpdate () {
+    setCurrentInstance(this)
+  },
+  beforeMount () {
+    setCurrentInstance(this)
   }
 })
 

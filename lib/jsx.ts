@@ -150,14 +150,13 @@ const jsx = function (
 
   // Check is JSXS function.
   const isJsxsFunc = typeof tag === 'function' && isUndefined((tag as any).cid)
+  if (isJsxsFunc) {
+    return h({
+      render: tag as any
+    })
+  }
 
-  return h(
-    // JSXS function should be wrapped.
-    // @ts-ignore
-    isJsxsFunc ? { render: tag } : tag,
-    vNodeData,
-    isArray(config.children) ? config.children : [config.children]
-  )
+  return h(tag, vNodeData, isArray(config.children) ? config.children : [config.children])
 }
 
 export {
