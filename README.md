@@ -3,7 +3,7 @@
 [![npm version](https://badge.fury.io/js/@lancercomet%2Fvue2-jsx-runtime.svg)](https://badge.fury.io/js/@lancercomet%2Fvue2-jsx-runtime)
 ![Testing](https://github.com/LancerComet/vue2-jsx-runtime/workflows/Test/badge.svg)
 
-This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to convert Vue 2 JSX.
+This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to handle Vue 2 JSX.
 
 ## What's the different between this and Vue official solution?
 
@@ -342,18 +342,17 @@ This will be rendered as
 
 These format below are also available, but they are NOT recommended, just for compatibility.
 
-### Passing value
-
-```tsx
-<button v-bind:disabled={isDisabledRef.value}>Wow such a button</button>
-<button vBind:disabled={isDisabledRef.value}>Wow such a button</button>
-```
-
 ### On
 
 ```tsx
 <div v-on:click={onClick}></div>
 <div vOn:click={onClick}></div>
+```
+
+### v-model
+
+```tsx
+<input vModel={userInpuptRef.value} />
 ```
 
 ## For Vite users
