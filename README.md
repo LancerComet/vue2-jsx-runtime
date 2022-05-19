@@ -70,15 +70,26 @@ And in `.swcrc`:
 }
 ```
 
+### Vite (with SWC for example)
+
+Please read the section below.
+
 ## Usage
 
-### On event
+### Passing Value
 
 ```tsx
-// Evenet handler on HTML element.
-<button onClick={onClick}>Click me</button>
+// In setup.
+<button diabled={isDisabledRef.value}>Wow such a button</button>
 
-// Event handler on Vue component.
+// In render function.
+<button diabled='isDisable'>Very button</button>
+```
+
+### On
+
+```tsx
+<button onClick={onClick}>Click me</button>
 <MyComponent onTrigger={onTrigger} />
 
 // Using "on" to assign multiple events for once.
@@ -327,6 +338,24 @@ This will be rendered as
 </div>
 ```
 
+## Compatibility
+
+These format below are also available, but they are NOT recommended, just for compatibility.
+
+### Passing value
+
+```tsx
+<button v-bind:disabled={isDisabledRef.value}>Wow such a button</button>
+<button vBind:disabled={isDisabledRef.value}>Wow such a button</button>
+```
+
+### On
+
+```tsx
+<div v-on:click={onClick}></div>
+<div vOn:click={onClick}></div>
+```
+
 ## For Vite users
 
 For Vite users, it's better to use TSC or SWC instead of built-in ESBuild. Because ESBuild is very finicky at handling JSX for now, and it gives you no room to change its behavior.
@@ -334,6 +363,65 @@ For Vite users, it's better to use TSC or SWC instead of built-in ESBuild. Becau
 For faster compilation, SWC is recommended. You can use [unplugin-swc](https://github.com/egoist/unplugin-swc) to make Vite uses SWC.
 
 Once you have switched to SWC (TSC) from ESBuild, you will not only be able to use this package, but also get more features like `emitDecoratorMetadata` which is not supported by ESBuild, and the whole process is still darn fast.
+
+### Configuration
+
+After you have configured SWC (see Setup section above):
+
+1. Install [unplugin-swc](https://github.com/egoist/unplugin-swc).
+
+```
+npm install unplugin-swc --save-dev
+```
+
+2. Update `vite.config.ts`:
+
+```ts
+import { defineConfig } from 'vite'
+import swc from 'unplugin-swc'
+import { createVuePlugin } from 'vite-plugin-vue2'
+
+export default defineConfig({
+  plugins: [
+    swc.vite(),
+    createVuePlugin(),
+    ...
+  ]
+})
+```
+
+## Mixing usage
+
+If you have to use `JSX` and `SFC` together in Vite, you need to update your Vite config:
+
+```ts
+import { defineConfig } from 'vite'
+import swc from 'unplugin-swc'
+import { createVuePlugin } from 'vite-plugin-vue2'
+
+const swcPlugin = swc.vite()
+
+export default defineConfig({
+  plugins: [
+    {
+      ...swcPlugin,
+      transform (code, id, ...args) {
+        if (
+          id.endsWith('.tsx') || id.endsWith('.ts') ||
+          (id.includes('.vue') && id.includes('lang.ts'))
+        ) {
+          return swcPlugin.transform.call(this, code, id, ...args)
+        }
+      }
+    },
+
+    createVuePlugin(),
+    ...
+  ]
+})
+```
+
+This will make SWC to skip compiling Non-Typescript codes in Vue SFC.
 
 ## References
 
