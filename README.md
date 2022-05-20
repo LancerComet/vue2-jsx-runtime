@@ -416,7 +416,7 @@ If you want to disable this behavior, add `direct` modifier:
 
 ### Key
 
-Because `key` has been deprecated in new JSX transform, we have to use `v-bind:key` instead:
+Due to the limitation, we have to use `v-bind:key`:
 
 ```tsx
 <TransitionGroup>{
@@ -425,8 +425,6 @@ Because `key` has been deprecated in new JSX transform, we have to use `v-bind:k
   ))
 }</TransitionGroup>
 ```
-
-Please [check it out](https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md) for more information.
 
 ### Transition / TransitionGroup
 
