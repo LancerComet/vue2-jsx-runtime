@@ -324,8 +324,6 @@ Vue.extend({
 
 ### v-model
 
-It only supports using `v-model` on **HTML elements**, for now you cannot use v-model on Vue component. So please use `value` and `onUpdate` separately.
-
 #### Regular usage
 
 ```tsx
