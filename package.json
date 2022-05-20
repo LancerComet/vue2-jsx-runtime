@@ -1,6 +1,6 @@
 {
   "name": "@lancercomet/vue2-jsx-runtime",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "description": "JSX runtime for Vue 2.",
   "files": [
     "dist/",
