@@ -16,7 +16,7 @@ describe('HTML testing.', () => {
         )
       }
     })
-    expect(wrapper.html()).toBe('<div id="an-id" data-type="element" aria-label="label" role="button" class="this-is-class"></div>')
+    expect(wrapper.html()).toBe('<div data-type="element" aria-label="label" role="button" class="this-is-class" id="an-id"></div>')
   })
 
   it('It should deal with reactive attrs.', done => {
@@ -32,7 +32,7 @@ describe('HTML testing.', () => {
           contentRef.value = 'Doge II'
 
           nextTick(() => {
-            expect(wrapper.html()).toBe('<div id="id-1" data-id="id-1" class="static class-1">Doge II</div>')
+            expect(wrapper.html()).toBe('<div data-id="id-1" class="static class-1" id="id-1">Doge II</div>')
             done()
           })
         }
@@ -40,7 +40,7 @@ describe('HTML testing.', () => {
         const check = () => {
           // Wait wrapper is initialized.
           setTimeout(() => {
-            expect(wrapper.html()).toBe('<div id="id-0" data-id="id-0" class="static class-0">Doge</div>')
+            expect(wrapper.html()).toBe('<div data-id="id-0" class="static class-0" id="id-0">Doge</div>')
             increase()
           }, 500)
         }

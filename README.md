@@ -39,7 +39,7 @@ Update your `tsconfig.json` with:
 }
 ```
 
-> The reason why "jsx" should be set to "react-jsx" is this plugin matches the new JSX transform.
+> The reason why "jsx" should be set to "react-jsx" is this plugin has to meet the new JSX transform.
 
 ### SWC
 
@@ -80,10 +80,10 @@ Please read the section below.
 
 ```tsx
 // In setup.
-<button diabled={isDisabledRef.value}>Wow such a button</button>
+<button disabled={isDisabledRef.value}>Wow such a button</button>
 
 // In render function.
-<button diabled='isDisable'>Very button</button>
+<button disabled={this.isDisable}>Very button</button>
 ```
 
 ### On
@@ -107,6 +107,12 @@ Please read the section below.
 ```
 
 Native is only available for Vue components.
+
+### Rendering HTMl
+
+```tsx
+<div innerHTML={'<h1>Title</h1>'}></div>
+```
 
 ### HTML / Component ref
 
@@ -138,7 +144,7 @@ const Wrapper = defineComponent({
 })
 ```
 
-Due to limitations, using ref is a little different form to Vue 3.
+Due to limitations, using ref is a little different from to Vue 3.
 
 You can check [this](https://github.com/vuejs/composition-api#limitations) out for more information.
 
@@ -312,30 +318,6 @@ If you want to disable this behavior, add `direct` modifier:
 
 {/* By default, it will only assign what you have selected from IME. */}
 <input v-model={userInputRef} >
-```
-
-### Fragment (experimental)
-
-Vue 2 doesn't come with fragment support so this feature is supported by [vue-fragment](https://github.com/Thunberg087/vue-fragment) under the hood:
-
-```tsx
-<div>
-  <>
-    <h1>Wow such a fragment</h1>
-    <small>I can smell it</small>
-  </>
-</div>
-```
-
-This will be rendered as
-
-```html
-<div>
-  <!--fragment#head-->
-  <h1>Wow such a fragment</h1>
-  <small>I can smell it</small>
-  <!--fragment#tail-->
-</div>
 ```
 
 ## Compatibility

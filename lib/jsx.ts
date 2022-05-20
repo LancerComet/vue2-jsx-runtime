@@ -5,7 +5,7 @@ import {
   checkKeyIsNativeOn,
   checkKeyIsChildren,
   checkKeyIsClass,
-  checkKeyIsDomProps,
+  checkKeyIsHtmlAttr,
   checkKeyIsKey,
   checkKeyIsOnEvent,
   checkKeyIsOnObject,
@@ -18,7 +18,6 @@ import {
   removeNativeOn,
   removeOn, checkKeyIsRef
 } from './utils'
-import { Fragment } from './modules/fragment'
 import { dealWithVModel } from './modules/v-model'
 import { dealWithDirective } from './modules/directive'
 import { ConfigType, TagType } from './type'
@@ -40,15 +39,6 @@ const jsx = function (
     props: {},
     domProps: {},
     on: {}
-  }
-
-  const isFragment = isUndefined(tag) && config.children
-  if (isFragment) {
-    return h(
-      Fragment,
-      vNodeData,
-      isArray(config.children) ? config.children : [config.children]
-    )
   }
 
   // I treat every lowercase string as HTML element.
@@ -82,17 +72,13 @@ const jsx = function (
       continue
     }
 
-    if (checkKeyIsDomProps(key) && isHTMLElement) {
-      vNodeData.domProps[key] = value
-      continue
-    }
-
     // on.
     if (checkKeyIsOnObject(key)) {
       vNodeData.on = value
       continue
     }
 
+    // onXX:native
     if (checkKeyIsNativeOn(key) && !isHTMLElement) {
       const _key = removeNativeOn(key)
       vNodeData.nativeOn = vNodeData.nativeOn || {}
@@ -125,6 +111,7 @@ const jsx = function (
       continue
     }
 
+    // ref.
     if (checkKeyIsRef(key)) {
       vNodeData.ref = value
       continue
@@ -142,13 +129,17 @@ const jsx = function (
     }
 
     if (isHTMLElement) {
-      vNodeData.attrs[key] = value
+      if (checkKeyIsHtmlAttr(key)) {
+        vNodeData.attrs[key] = value
+      } else {
+        vNodeData.domProps[key] = value
+      }
     } else {
       vNodeData.props[key] = value
     }
   }
 
-  // Check is JSXS function.
+  // Check if it is JSXS function.
   const isJsxsFunc = typeof tag === 'function' && isUndefined((tag as any).cid)
   if (isJsxsFunc) {
     return h({
