@@ -1,4 +1,5 @@
 import type { VNode, VNodeData } from 'vue'
+import Vue from 'vue'
 import {
   checkKeyIsVueDirective,
   checkIsHTMLElement,
@@ -22,6 +23,7 @@ import { ConfigType, TagType } from './type'
 import { getCurrentInstance } from './runtime'
 
 const V_BIND_REGEXP = /^v(-b|B)ind:/
+let _jsxsId = 0
 
 // Reference:
 // https://cn.vuejs.org/v2/guide/render-function.html
@@ -144,11 +146,21 @@ const jsx = function (
   const children = isArray(config.children) ? config.children : [config.children]
 
   // Check if it is JSXS function.
+  // JSXS function must be wrapped into a Vue component, and in order to
+  // avoid re-creating component, register it as a global component, and
+  // next time it will be taken out from Vue.
   const isJsxsFunc = typeof tag === 'function' && isUndefined((tag as any).cid)
   if (isJsxsFunc) {
-    return h({
-      render: tag as any
-    }, vNodeData, children)
+    // @ts-ignore
+    let jsxsId = tag.__jsxs_id__
+    if (!jsxsId) {
+      jsxsId = 'jsxs-comp-' + _jsxsId++
+      // @ts-ignore
+      tag.__jsxs_id__ = jsxsId
+      // @ts-ignore
+      Vue.component(jsxsId, { render: tag })
+    }
+    return h(Vue.component(jsxsId), vNodeData, children)
   }
 
   return h(tag, vNodeData, children)
