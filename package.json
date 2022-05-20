@@ -1,6 +1,6 @@
 {
   "name": "@lancercomet/vue2-jsx-runtime",
-  "version": "0.1.0-beta.4",
+  "version": "0.1.0",
   "description": "JSX runtime for Vue 2.",
   "files": [
     "dist/",
@@ -14,6 +14,7 @@
     "build": "rollup -c",
     "lint": "eslint ./lib/**",
     "test": "jest",
+    "push": "npm run build && npm run test && npm publish",
     "prebuild": "npm run lint",
     "preversion": "npm run build && npm run test",
     "postbuild": "node ./post-build.js"
