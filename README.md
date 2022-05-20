@@ -108,7 +108,7 @@ Please read the section below.
 
 Native is only available for Vue components.
 
-### Rendering HTMl
+### Rendering HTML
 
 ```tsx
 <div innerHTML={'<h1>Title</h1>'}></div>
