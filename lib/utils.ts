@@ -19,6 +19,8 @@ const domPropsList = 'accept,accesskey,action,align,alt,async,autocomplete,' +
 const ON_EVENT_REGEXP = /^((v(-o|O)n:)|on)/
 const HTML_TAG_REGEXP = /^[\da-z]+$/
 const NATIVE_ON_REGEXP = /:native$/
+const KEY_REGEXP = /^v(-b|B)ind:key$/
+const VUE_DIRECTIVE_REGEXP = /^v(-|[A-Z])/
 
 const isArray = (target: unknown): target is any[] => Array.isArray(target)
 const isBoolean = (target: unknown): target is boolean => typeof target === 'symbol'
@@ -38,9 +40,9 @@ const checkKeyIsOnEvent = (key: string) => ON_EVENT_REGEXP.test(key)
 const checkKeyIsOnObject = (key: string) => key === 'on'
 const checkKeyIsSlot = (key: string) => key === 'slot'
 const checkKeyIsScopedSlots = (key: string) => key === 'scopedSlots'
-const checkKeyIsKey = (key: string) => key === 'key'
+const checkKeyIsKey = (key: string) => KEY_REGEXP.test(key)
 const checkKeyIsNativeOn = (key: string) => NATIVE_ON_REGEXP.test(key)
-const checkKeyIsVueDirective = (key: string) => /^v(-|[A-Z])/.test(key)
+const checkKeyIsVueDirective = (key: string) => VUE_DIRECTIVE_REGEXP.test(key)
 const checkKeyIsRef = (key: string) => key === 'ref'
 
 // The reason why I don't use "isRef" which is provided by @vue/composition-api is that

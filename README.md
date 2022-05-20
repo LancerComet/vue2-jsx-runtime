@@ -414,6 +414,61 @@ If you want to disable this behavior, add `direct` modifier:
 <input v-model={userInputRef} >
 ```
 
+### Key
+
+Because `key` has been deprecated in new JSX transform, we have to use `v-bind:key` instead:
+
+```tsx
+<TransitionGroup>{
+  userList.map(item => (
+    <div v-bind:key={item.id}>{item.name}</div>
+  ))
+}</TransitionGroup>
+```
+
+Please [check it out](https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md) for more information.
+
+### Transition / TransitionGroup
+
+```tsx
+import Vue from 'vue'
+
+const Transition = Vue.component('Transition')
+const TransitionGroup = Vue.component('TransitionGroup')
+
+setup () {
+  return () => (
+    <div>
+      <TransitionGroup>
+        <div v-bind:key='key-1'>Some element</div>
+        <div v-bind:key='key-2'>Some element</div>
+      </TransitionGroup>
+      <Transition>
+        <div>Some element</div>
+      </Transition>
+    </div>
+  )
+}
+```
+
+or
+
+```tsx
+setup () {
+  return () => (
+    <div>
+      <transition-group>
+        <div v-bind:key='key-1'>Some element</div>
+        <div v-bind:key='key-2'>Some element</div>
+      </transition-group>
+      <transition>
+        <div>Some element</div>
+      </transition>
+    </div>
+  )
+}
+```
+
 ## Compatibility
 
 These format below are also available, but they are NOT recommended, just for compatibility.
@@ -429,6 +484,13 @@ These format below are also available, but they are NOT recommended, just for co
 
 ```tsx
 <input vModel={userInpuptRef.value} />
+```
+
+### Key
+
+```tsx
+<div v-bind:key='key-1' />
+<div vBind:key='key-1' />
 ```
 
 ## For Vite users

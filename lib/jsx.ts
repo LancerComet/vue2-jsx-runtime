@@ -39,6 +39,13 @@ const jsx = function (
     on: {}
   }
 
+  // Support for using <transition> and <transition-group>.
+  if (tag === 'transition') {
+    tag = 'Transition'
+  } else if (tag === 'transition-group') {
+    tag = 'TransitionGroup'
+  }
+
   // I treat every lowercase string as HTML element.
   // Because in JSX Vue component should be (Upper) CamelCase named.
   const isHTMLElement = checkIsHTMLElement(tag)
@@ -52,6 +59,9 @@ const jsx = function (
 
     const value = config[key]
 
+    // Because of 'key' is deprecated in new JSX transform,
+    // we gonna use 'v-key' or 'vKey' instead.
+    // https://github.com/reactjs/rfcs/blob/createlement-rfc/text/0000-create-element-changes.md#deprecate-spreading-key-from-objects
     if (checkKeyIsKey(key)) {
       vNodeData.key = value
       continue
