@@ -117,11 +117,13 @@ describe('v-model render function testing.', () => {
     expect(checkboxInputElement.checked).toBe(false)
 
     // input -> value
+    checkboxInputElement.checked = true
     checkboxInput.trigger('change')
     await sleep(10)
     expect(vm.userInput).toBe('on')
     expect(checkboxInputElement.checked).toBe(true)
 
+    checkboxInputElement.checked = false
     checkboxInput.trigger('change')
     await sleep(10)
     expect(vm.userInput).toBe(undefined)

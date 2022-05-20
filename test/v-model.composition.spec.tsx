@@ -108,15 +108,17 @@ describe('v-model composition API testing.', () => {
     expect(checkboxInputElement.checked).toBe(false)
 
     // input -> value
+    checkboxInputElement.checked = true
     checkboxInput.trigger('change')
     await sleep(10)
-    expect(userInputRef.value).toBe('on')
     expect(checkboxInputElement.checked).toBe(true)
+    expect(userInputRef.value).toBe('on')
 
+    checkboxInputElement.checked = false
     checkboxInput.trigger('change')
     await sleep(10)
-    expect(userInputRef.value).toBe(undefined)
     expect(checkboxInputElement.checked).toBe(false)
+    expect(userInputRef.value).toBe(undefined)
 
     // value -> input
     userInputRef.value = 'on'

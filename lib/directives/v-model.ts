@@ -181,7 +181,17 @@ const dealWithVModel = (
 
   // v-model on component.
   if (!isHTMLElement) {
-    // TODO: Add component support.
+    const instance = getCurrentInstance()
+    vNodeData.props.value = isString(bindingTarget)
+      ? instance[bindingTarget]
+      : bindingTarget.value
+    vNodeData.on.input = (value) => {
+      if (isString(bindingTarget)) {
+        instance[bindingTarget] = value
+      } else {
+        bindingTarget.value = value
+      }
+    }
   }
 }
 
