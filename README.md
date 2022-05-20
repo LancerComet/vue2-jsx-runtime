@@ -560,6 +560,10 @@ export default defineConfig({
 
 This will make SWC to skip compiling Non-Typescript codes in Vue SFC.
 
+## Contributing
+
+Feel free to open issue or pull request to make it better.
+
 ## References
 
  - [Introducing the New JSX Transform](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html)
