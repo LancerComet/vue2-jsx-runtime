@@ -59,3 +59,7 @@ describe('v-model IME testing.', () => {
     expect(userInputRef.value).toBe('wow i am typing in ime and i wanna select some japanese character')
   })
 })
+
+describe('v-model argument testing.', () => {
+
+})

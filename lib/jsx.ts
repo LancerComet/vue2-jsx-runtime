@@ -12,14 +12,12 @@ import {
   checkKeyIsScopedSlots,
   checkKeyIsSlot,
   checkKeyIsStyle,
-  checkKeyIsVModel,
   isArray,
   isUndefined,
   removeNativeOn,
   removeOn, checkKeyIsRef
 } from './utils'
-import { dealWithVModel } from './modules/v-model'
-import { dealWithDirective } from './modules/directive'
+import { dealWithDirective } from './directives'
 import { ConfigType, TagType } from './type'
 import { getCurrentInstance } from './runtime'
 
@@ -105,21 +103,15 @@ const jsx = function (
       continue
     }
 
-    // v-model, vModel.
-    if (checkKeyIsVModel(key)) {
-      dealWithVModel(tag, key, config, vNodeData, isHTMLElement)
-      continue
-    }
-
     // ref.
     if (checkKeyIsRef(key)) {
       vNodeData.ref = value
       continue
     }
 
-    // v-dir, vDir
+    // v-xxx, vXxx
     if (checkKeyIsVueDirective(key)) {
-      dealWithDirective(key, vNodeData, config)
+      dealWithDirective(tag, key, vNodeData, config, isHTMLElement)
       continue
     }
 
@@ -139,15 +131,17 @@ const jsx = function (
     }
   }
 
+  const children = isArray(config.children) ? config.children : [config.children]
+
   // Check if it is JSXS function.
   const isJsxsFunc = typeof tag === 'function' && isUndefined((tag as any).cid)
   if (isJsxsFunc) {
     return h({
       render: tag as any
-    })
+    }, vNodeData, children)
   }
 
-  return h(tag, vNodeData, isArray(config.children) ? config.children : [config.children])
+  return h(tag, vNodeData, children)
 }
 
 export {

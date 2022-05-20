@@ -44,7 +44,6 @@ const checkKeyIsSlot = (key: string) => key === 'slot'
 const checkKeyIsScopedSlots = (key: string) => key === 'scopedSlots'
 const checkKeyIsKey = (key: string) => key === 'key'
 const checkKeyIsNativeOn = (key: string) => NATIVE_ON_REGEXP.test(key)
-const checkKeyIsVModel = (key: string): key is 'v-model' | 'vModel' => /^v(-m|M)odel$/.test(key)
 const checkKeyIsVueDirective = (key: string) => /^v(-|[A-Z])/.test(key)
 const checkKeyIsRef = (key: string) => key === 'ref'
 const checkIsInputOrTextarea = (target: unknown): target is 'input' | 'textarea' => target === 'input' || target === 'textarea'
@@ -87,7 +86,6 @@ export {
   checkKeyIsRef,
   checkIsRefObj,
 
-  checkKeyIsVModel,
   checkKeyIsVueDirective,
   checkIsInputOrTextarea,
 

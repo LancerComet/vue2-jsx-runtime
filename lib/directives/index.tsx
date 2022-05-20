@@ -3,12 +3,24 @@ import type { Ref } from '@vue/composition-api'
 import { paramCase } from 'change-case'
 import { checkIsRefObj, isBoolean, isNumber, isString } from '../utils'
 import { getCurrentInstance } from '../runtime'
+import { dealWithVModel } from './v-model'
+import { TagType } from '../type'
+import { dealWithVText } from './v-text'
+import { dealWithVHTML } from './v-html'
 
-// v-xxx-xxx:a.b.c => {
-//   name: 'xxx-xxx',
-//   argument: 'a',
-//   modifiers: { a: true, b: true, c: true }
-// }
+const checkIsVModel = (key: string): key is 'v-model' | 'vModel' => /^v(-m|M)odel$/.test(key)
+const checkIsVText = (key: string): key is 'v-text' | 'vText' => /^v(-t|T)ext$/.test(key)
+const checkIsVHTML = (key: string): key is 'v-html' | 'vHtml' => /^v(-h|H)tml$/.test(key)
+
+/**
+ * v-show:a.b.c => {
+ *   name: 'show',
+ *   argument: 'a',
+ *   modifiers: { a: true, b: true, c: true }
+*  }
+ *
+ * @param key
+ */
 const getDirectiveInfo = (key: string) => {
   key = key.replace(/^v-?/, '') // xxx-xxx, xxxXxx:a.b.c
   const [name, args] = key.split(':') // ['xxx-xxx', 'a.b.c']
@@ -35,46 +47,42 @@ const getDirectiveInfo = (key: string) => {
   }
 }
 
-const getDirValue = (directiveRawValue: string | Ref<string>) => {
-  if (checkIsRefObj(directiveRawValue)) {
-    return directiveRawValue.value
-  }
-
-  if (isBoolean(directiveRawValue) || isNumber(directiveRawValue)) {
-    return directiveRawValue
-  }
-
-  const isVariableName = /^[a-zA-Z_$]([\d\w$]+)?$/.test(directiveRawValue)
-  if (isVariableName) {
-    const vm = getCurrentInstance()
-    return vm[directiveRawValue]
-  }
-
-  const floatValue = parseFloat(directiveRawValue)
-  if (!isNaN(floatValue)) {
-    return floatValue
-  }
-
-  // Array, function, object, null, undefined, ect.
-  return directiveRawValue
-}
-
 const dealWithDirective = (
+  tag: TagType,
   key: string, // v-xxx-xxx, vXxxXxx:a.b.c
   vNodeData: VNodeData,
   config: {
     children?: VNodeChildren
     [props: string]: any
-  } = {}
+  } = {},
+  isHTMLElement: boolean
 ) => {
   vNodeData.directives = vNodeData.directives || []
+
+  // v-model.
+  if (checkIsVModel(key)) {
+    dealWithVModel(tag, config[key], config, vNodeData, isHTMLElement)
+    return
+  }
+
+  // v-text.
+  if (checkIsVText(key)) {
+    dealWithVText(vNodeData, config[key])
+    return
+  }
+
+  // v-html.
+  if (checkIsVHTML(key)) {
+    dealWithVHTML(vNodeData, config[key])
+    return
+  }
 
   const directiveInfo = getDirectiveInfo(key)
   const directiveRawValue = config[key] as string | Ref<string>
 
   const directive: VNodeDirective = {
     name: directiveInfo.name,
-    value: getDirValue(directiveRawValue),
+    value: directiveRawValue,
     expression: isString(directiveRawValue) ? directiveRawValue : undefined,
     arg: directiveInfo.argument,
     modifiers: directiveInfo.modifiers

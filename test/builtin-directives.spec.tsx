@@ -3,10 +3,10 @@
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
 import Vue from 'vue'
-import { getDirectiveInfo } from '../lib/modules/directive'
+import { getDirectiveInfo } from '../lib/directives'
 import { sleep } from './utils/sleep'
 
-describe('Directive testing.', () => {
+describe('Directive util testing.', () => {
   it('getDirectiveInfo should work properly.', () => {
     expect(getDirectiveInfo('v-model')).toEqual({
       name: 'model'
@@ -48,13 +48,15 @@ describe('Directive testing.', () => {
       modifiers: { b: true, c: true }
     })
   })
+})
 
+describe('v-show', () => {
   it('v-show should work properly (Ref).', async () => {
     const isDisplayRef = ref(true)
     const Example = defineComponent({
       setup () {
         return () => (
-          <div v-show={isDisplayRef}>Wow</div>
+          <div v-show={isDisplayRef.value}>Wow</div>
         )
       }
     })
@@ -66,10 +68,14 @@ describe('Directive testing.', () => {
     expect(wrapper.isVisible()).toBe(false)
   })
 
-  it('v-show should work properly (template).', async () => {
+  it('v-show should work properly (Render function).', async () => {
     const Example = Vue.extend({
-      data: () => ({ isDisplay: true }),
-      render: () => <div v-show='isDisplay'>Wow</div>
+      data () {
+        return { isDisplay: true }
+      },
+      render () {
+        return <div v-show={this.isDisplay}>Wow</div>
+      }
     })
     const wrapper = shallowMount(Example)
     expect(wrapper.isVisible()).toBe(true)
@@ -77,5 +83,66 @@ describe('Directive testing.', () => {
     wrapper.vm.isDisplay = false
     await sleep(10)
     expect(wrapper.isVisible()).toBe(false)
+  })
+})
+
+describe('v-text', () => {
+  it('v-text should work properly.', () => {
+    const wrapper = shallowMount(Vue.extend({
+      data () {
+        return {
+          text: 'John Smith'
+        }
+      },
+      render () {
+        return (
+          <div>
+            <div v-text={this.text}></div>
+            <div vText={this.text}></div>
+            <div textContent={this.text}></div>
+          </div>
+        )
+      }
+    }))
+
+    expect(wrapper.html()).toBe(
+      '<div>\n' +
+      '  <div>John Smith</div>\n' +
+      '  <div>John Smith</div>\n' +
+      '  <div>John Smith</div>\n' +
+      '</div>'
+    )
+  })
+})
+
+describe('v-html', () => {
+  it('v-html should work properly.', () => {
+    const wrapper = shallowMount(defineComponent({
+      setup () {
+        const htmlRef = ref('<h1>Title</h1>')
+
+        return () => (
+          <div>
+            <div v-html={htmlRef.value}></div>
+            <div vHtml={htmlRef.value}></div>
+            <div innerHTML={htmlRef.value}></div>
+          </div>
+        )
+      }
+    }))
+
+    expect(wrapper.html()).toBe(
+      '<div>\n' +
+      '  <div>\n' +
+      '    <h1>Title</h1>\n' +
+      '  </div>\n' +
+      '  <div>\n' +
+      '    <h1>Title</h1>\n' +
+      '  </div>\n' +
+      '  <div>\n' +
+      '    <h1>Title</h1>\n' +
+      '  </div>\n' +
+      '</div>'
+    )
   })
 })

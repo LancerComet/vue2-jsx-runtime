@@ -14,12 +14,11 @@ type vModelBinding = string |
 
 const dealWithVModel = (
   tag: TagType,
-  key: 'v-model' | 'vModel',
+  bindingExpression: vModelBinding,
   config: ConfigType,
   vNodeData: VNodeData,
   isHTMLElement: boolean
 ) => {
-  const bindingExpression = config[key] as vModelBinding
   let bindingTarget: string | Ref<unknown>
   // let argument: string | undefined
   let modifiers: string[] = []

@@ -78,21 +78,66 @@ Please read the section below.
 
 ### Passing Value
 
-```tsx
-// In setup.
-<button disabled={isDisabledRef.value}>Wow such a button</button>
+#### Setup
 
-// In render function.
-<button disabled={this.isDisable}>Very button</button>
+```tsx
+defineComponent({
+  setup () {
+    const isDisabledRef = ref(false)
+    return () => (
+      <button disabled={isDisabledRef.value}>Wow such a button</button>
+    )
+  }
+})
+```
+
+#### Render function
+
+```tsx
+Vue.extend({
+  data () {
+    return {
+      isDisabled: false
+    }
+  },
+  render () {
+    return (
+      <button disabled={this.isDisabled}>Very button</button>
+    )
+  }
+})
+
 ```
 
 ### On
 
-```tsx
-<button onClick={onClick}>Click me</button>
-<MyComponent onTrigger={onTrigger} />
+#### Setup
 
-// Using "on" to assign multiple events for once.
+```tsx
+setup () {
+  const onClick = () => {}
+  return () => (
+    <button onClick={onClick}>Click me</button>
+  )
+}
+```
+
+#### Render function
+
+```tsx
+Vue.extend({
+  methods: {
+    onClick () {}
+  },
+  render () {
+    return <button onClick={this.onClick}>Click me</button>
+  }
+})
+```
+
+#### Using "on" object to assign multiple events for once
+
+```tsx
 <div on={{
   click: onClick,
   focus: onFocus,
@@ -108,10 +153,16 @@ Please read the section below.
 
 Native is only available for Vue components.
 
-### Rendering HTML
+### Rendering HTML or text
 
 ```tsx
-<div innerHTML={'<h1>Title</h1>'}></div>
+// Setting HTML.
+<div v-html={htmlStrRef.value}></div>   // Using Vue directive.
+<div innerHTML='<h1>Title</h1>'></div>  // Using dom prop.
+
+// Setting text.
+<div v-text={this.displayText}></div>   // Using Vue directive.
+<div textContent={'Very Vue'}></div>    // Using dom prop.
 ```
 
 ### HTML / Component ref
@@ -226,6 +277,51 @@ Output:
 </div>
 ```
 
+### Built-in directives
+
+#### Setup
+
+```tsx
+defineComponent({
+  setup () {
+    const isDisplayRef = ref(false)
+    const textContentRef = ref('John Smith')
+    const htmlContentRef = ref('<h1>John Smith</h1>')
+
+    return () => (
+      <div>
+        <div v-show={isDisabledRef.value}>Page content</div>
+        <div v-text={textContentRef.value}></div>
+        <div v-html={htmlContentRef.value}></div>
+      </div>
+    )
+  }
+})
+```
+
+#### Render function
+
+```tsx
+Vue.extend({
+  data () {
+    return {
+      isDisplay: false,
+      textContent: 'John Smith',
+      htmlContent: '<h1>John Smith</h1>'
+    }
+  },
+  render () {
+    return (
+      <div>
+        <div v-show={this.isDisplay}>Page content</div>
+        <div v-text={this.textContent}></div>
+        <div v-html={this.htmlContent}></div>
+      </div>
+    )
+  }
+})
+```
+
 ### v-model
 
 It only supports using `v-model` on **HTML elements**, for now you cannot use v-model on Vue component. So please use `value` and `onUpdate` separately.
@@ -236,9 +332,9 @@ It only supports using `v-model` on **HTML elements**, for now you cannot use v-
 import ref from '@vue/composition-api'
 import Vue from 'vue'
 
-// In composition API
+// Setup.
 const Example = defineComponent({
-  setup (_, { refs }) {
+  setup () {
     const nameRef = ref('')
     return () => (
       <div>
