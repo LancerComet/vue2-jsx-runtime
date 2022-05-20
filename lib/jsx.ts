@@ -5,7 +5,7 @@ import {
   checkKeyIsNativeOn,
   checkKeyIsChildren,
   checkKeyIsClass,
-  checkKeyIsHtmlAttr,
+  checkKeyIsDomProp,
   checkKeyIsKey,
   checkKeyIsOnEvent,
   checkKeyIsOnObject,
@@ -121,10 +121,10 @@ const jsx = function (
     }
 
     if (isHTMLElement) {
-      if (checkKeyIsHtmlAttr(key)) {
-        vNodeData.attrs[key] = value
-      } else {
+      if (checkKeyIsDomProp(key)) {
         vNodeData.domProps[key] = value
+      } else {
+        vNodeData.attrs[key] = value
       }
     } else {
       vNodeData.props[key] = value

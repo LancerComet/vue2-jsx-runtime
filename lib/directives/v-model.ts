@@ -1,4 +1,4 @@
-import { checkIsInputOrTextarea, checkIsRefObj, isArray, isString, isUndefined } from '../utils'
+import { checkIsRefObj, isArray, isString, isUndefined } from '../utils'
 import type { Ref } from '@vue/composition-api'
 import type { VNodeData } from 'vue'
 import { ConfigType, TagType } from '../type'
@@ -35,27 +35,34 @@ const dealWithVModel = (
     }
   }
 
-  if (checkIsInputOrTextarea(tag)) {
-    const isInput = tag === 'input'
+  const instance = getCurrentInstance()
+
+  if (tag === 'select') {
+    vNodeData.domProps.value = isString(bindingTarget)
+      ? instance[bindingTarget]
+      : bindingTarget.value
+    vNodeData.on.change = (event: Event) => {
+      const target = event.target as HTMLSelectElement
+      if (isString(bindingTarget)) {
+        instance[bindingTarget] = target.value
+      } else {
+        bindingTarget.value = target.value
+      }
+    }
+    return
+  }
+
+  if (tag === 'input') {
     const inputType = config.type // 'file', 'text', 'number', .ect.
 
     // Skip unsupported input.
-    const isSkippedInput = /button|submit|reset/.test(inputType)
+    const isSkippedInput = /button|file|submit|reset/.test(inputType)
     if (isSkippedInput) {
       return
     }
 
-    const instance = getCurrentInstance()
-
-    // File.
-    const isFileInput = isInput && inputType === 'file'
-    if (isFileInput) {
-      // TODO: ...
-      return
-    }
-
     // Radio.
-    const isRadioInput = isInput && inputType === 'radio'
+    const isRadioInput = inputType === 'radio'
     if (isRadioInput) {
       vNodeData.domProps.checked = isString(bindingTarget)
         ? instance[bindingTarget] === config.value
@@ -72,7 +79,7 @@ const dealWithVModel = (
     }
 
     // Checkbox.
-    const isCheckboxInput = isInput && inputType === 'checkbox'
+    const isCheckboxInput = inputType === 'checkbox'
     if (isCheckboxInput) {
       const arrayBindingExec = (bindingArr: unknown[]) => {
         vNodeData.domProps.checked = bindingArr.includes(config.value)
@@ -121,8 +128,10 @@ const dealWithVModel = (
       }
       return
     }
+  }
 
-    // Others are treated as text fields.
+  // Others are treated as text fields.
+  if (tag === 'input' || tag === 'textarea') {
     const isDirectInput = modifiers.includes('direct')
     const isLazyInput = modifiers.includes('lazy')
     const emitValue = (value: string) => {
@@ -147,7 +156,7 @@ const dealWithVModel = (
       : bindingTarget.value
     vNodeData.on.input = (event: Event) => {
       if (
-        modifiers.includes('lazy') ||
+        isLazyInput ||
         (!isDirectInput && vNodeData.attrs[IME_START_KEY])
       ) {
         return

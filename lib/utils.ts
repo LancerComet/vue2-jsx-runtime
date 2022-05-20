@@ -1,24 +1,20 @@
 import { camelCase } from 'change-case'
 
 // https://github.com/vuejs/vue/blob/0603ff695d2f41286239298210113cbe2b209e28/src/platforms/web/server/util.js#L5
-// Difference:
-// + role
-// - id
-const htmlAttrList = (
-  'accept,accept-charset,accesskey,action,align,alt,async,autocomplete,' +
+const domPropsList = 'accept,accesskey,action,align,alt,async,autocomplete,' +
   'autofocus,autoplay,autosave,bgcolor,border,buffered,challenge,charset,' +
-  'checked,cite,class,code,codebase,color,cols,colspan,content,' +
+  'checked,cite,code,codebase,color,cols,colspan,content,' +
   'contenteditable,contextmenu,controls,coords,data,datetime,default,' +
   'defer,dir,dirname,disabled,download,draggable,dropzone,enctype,for,' +
-  'form,formaction,headers,height,hidden,high,href,hreflang,http-equiv,' +
-  'icon,ismap,itemprop,keytype,kind,label,lang,language,list,loop,low,' +
+  'form,formaction,headers,height,hidden,high,href,hreflang,' +
+  'icon,id,ismap,itemprop,keytype,kind,label,lang,language,list,loop,low,' +
   'manifest,max,maxlength,media,method,GET,POST,min,multiple,email,file,' +
   'muted,name,novalidate,open,optimum,pattern,ping,placeholder,poster,' +
-  'preload,radiogroup,readonly,rel,required,reversed,role,rows,rowspan,sandbox,' +
+  'preload,radiogroup,readonly,rel,required,reversed,rows,rowspan,sandbox,' +
   'scope,scoped,seamless,selected,shape,size,type,text,password,sizes,span,' +
   'spellcheck,src,srcdoc,srclang,srcset,start,step,style,summary,tabindex,' +
-  'target,title,usemap,value,width,wrap'
-).split(',')
+  'target,title,usemap,value,width,wrap,' +
+  'className,classList,innerHTML,innerText,outerHTML,outerText,textContent'.split(',')
 
 const ON_EVENT_REGEXP = /^((v(-o|O)n:)|on)/
 const HTML_TAG_REGEXP = /^[\da-z]+$/
@@ -37,7 +33,7 @@ const checkIsHTMLElement = (tag: unknown) => isString(tag) && HTML_TAG_REGEXP.te
 const checkKeyIsClass = (key: string) => key === 'class'
 const checkKeyIsChildren = (key: string) => key === 'children'
 const checkKeyIsStyle = (key: string) => key === 'style'
-const checkKeyIsHtmlAttr = (key: string) => htmlAttrList.includes(key) || key.indexOf('data-') === 0 || key.indexOf('aria-') === 0
+const checkKeyIsDomProp = (key: string) => domPropsList.includes(key)
 const checkKeyIsOnEvent = (key: string) => ON_EVENT_REGEXP.test(key)
 const checkKeyIsOnObject = (key: string) => key === 'on'
 const checkKeyIsSlot = (key: string) => key === 'slot'
@@ -46,7 +42,6 @@ const checkKeyIsKey = (key: string) => key === 'key'
 const checkKeyIsNativeOn = (key: string) => NATIVE_ON_REGEXP.test(key)
 const checkKeyIsVueDirective = (key: string) => /^v(-|[A-Z])/.test(key)
 const checkKeyIsRef = (key: string) => key === 'ref'
-const checkIsInputOrTextarea = (target: unknown): target is 'input' | 'textarea' => target === 'input' || target === 'textarea'
 
 // The reason why I don't use "isRef" which is provided by @vue/composition-api is that
 // this function will be broken under SWC.
@@ -76,7 +71,7 @@ export {
   checkKeyIsClass,
   checkKeyIsChildren,
   checkKeyIsStyle,
-  checkKeyIsHtmlAttr,
+  checkKeyIsDomProp,
   checkKeyIsOnEvent,
   checkKeyIsOnObject,
   checkKeyIsSlot,
@@ -87,7 +82,6 @@ export {
   checkIsRefObj,
 
   checkKeyIsVueDirective,
-  checkIsInputOrTextarea,
 
   removeOn,
   removeNativeOn

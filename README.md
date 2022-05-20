@@ -70,7 +70,7 @@ And in `.swcrc`:
 }
 ```
 
-### Vite (with SWC for example)
+### Vite
 
 Please read the section below.
 
@@ -437,7 +437,7 @@ For Vite users, it's better to use TSC or SWC instead of built-in ESBuild. Becau
 
 For faster compilation, SWC is recommended. You can use [unplugin-swc](https://github.com/egoist/unplugin-swc) to make Vite uses SWC.
 
-Once you have switched to SWC (TSC) from ESBuild, you will not only be able to use this package, but also get more features like `emitDecoratorMetadata` which is not supported by ESBuild, and the whole process is still darn fast.
+Once you have switched to SWC (TSC) from ESBuild, you will not only be able to use JSX, but also get more features like `emitDecoratorMetadata` which is not supported by ESBuild, and the whole process is still darn fast.
 
 ### Configuration
 
