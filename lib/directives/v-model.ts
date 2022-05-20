@@ -92,7 +92,7 @@ const dealWithVModel = (
         vNodeData.on.change = (event: Event) => {
           const target = event.target as HTMLInputElement
           const isValueSpecified = !isUndefined(config.value)
-          const newCheckStatus = !target.checked
+          const newCheckStatus = target.checked
           if (isString(bindingTarget)) {
             instance[bindingTarget] = isValueSpecified
               ? target.value
