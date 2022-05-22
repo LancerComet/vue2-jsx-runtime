@@ -84,7 +84,11 @@ const jsx = function (
 
     // on.
     if (checkKeyIsOnObject(key)) {
-      vNodeData.on = value
+      // Merge on events.
+      vNodeData.on = {
+        ...vNodeData.on,
+        ...value
+      }
       continue
     }
 
