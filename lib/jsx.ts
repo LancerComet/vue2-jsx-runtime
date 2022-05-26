@@ -1,5 +1,4 @@
 import type { VNode, VNodeData } from 'vue'
-import Vue from 'vue'
 import {
   checkKeyIsVueDirective,
   checkIsHTMLElement,
