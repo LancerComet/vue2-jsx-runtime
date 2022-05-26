@@ -558,6 +558,10 @@ export default defineConfig({
 
 This will make SWC to skip compiling Non-Typescript codes in Vue SFC.
 
+## Hot Reload
+
+Use [vite-plugin-vue2-hmr](https://github.com/LancerComet/vite-plugin-vue2-hmr) to enable Vue2 JSX hot reload in Vite.
+
 ## Contributing
 
 Feel free to open issue or pull request to make it better.
