@@ -3,29 +3,36 @@
 [![npm version](https://badge.fury.io/js/@lancercomet%2Fvue2-jsx-runtime.svg)](https://badge.fury.io/js/@lancercomet%2Fvue2-jsx-runtime)
 ![Testing](https://github.com/LancerComet/vue2-jsx-runtime/workflows/Test/badge.svg)
 
-This is a package for handling Vue 2 JSX, you can use it with your favourite toolchain like SWC, TSC, Vite* to handle Vue 2 JSX.
+This package is designed for handling Vue 2 JSX.
 
-## What's the different between this and Vue official solution?
+## What's the different between this and the official solution?
 
-The official Vue 2 JSX support uses Babel to convert JSX to Vue render function, so your workflow would be like:
+The official solution is a set of Babel plugins which convert JSX to Vue render function, and this package is the [New JSX Transform](https://reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html) implement for Vue 2. They are just two different ways to achieve the goal.
+
+For TypeScript users, when you use the official solution your workflow would be like:
 
 ```
-JSX -> Babel -> Vite (ESBuild) / TSC / SWC -> JS  
+TSX -> Babel -> Vite (ESBuild) / TSC / SWC -> JS  
 ```
 
-The Babel just slows down the whole process, and we all know that these compilers actually support JSX transforming out of box. So if we have a Vue 2 JSX transformer for these compilers, we can just get rid of Babel.
+The Babel just slows down the whole process, and we all know that these compilers actually support JSX transforming out of box. So if we have a Vue 2 New JSX Transform runtime for those compilers, we can just get rid of Babel.
 
-Fortunately, TSC and SWC support using `jsxImportSource` to decide which JSX factory module we gonna use. So if you use this package, you will be able to use Vue 2 JSX without Babel.
+For JavaScript users, you have to use Babel with it to transform JSX into JavaScript codes. [This example](https://github.com/LancerComet/vue2-jsx-runtime-webpack) shows how to use it with Babel and Webpack.
+
+The reasons I developed this package:
+
+ 1. I want to use Vite (it's fast) without ESBuild (doesn't support EmitDecoratorMetadata), so I have to use SWC + Vite, and I also need Vue 2 JSX support, but I don't want to bring Babel in.
+ 3. Using `v-model` in `JSX-returing-setup()` with the official solution will break the Vue 2 app. It has been a long time but still not being fixed yet.
 
 ## Setup
 
-First please make sure `Vue@2` has been installed in your project, then
+First, please make sure `Vue@2` has been installed in your project, then
 
 ```
 npm install @lancercomet/vue2-jsx-runtime --save
 ```
 
-### TSC
+### Using TSC
 
 Update your `tsconfig.json` with:
 
@@ -41,7 +48,7 @@ Update your `tsconfig.json` with:
 
 > The reason why "jsx" should be set to "react-jsx" is this plugin has to meet the new JSX transform.
 
-### SWC
+### Using SWC
 
 In `tsconfig.json`:
 
@@ -70,7 +77,11 @@ And in `.swcrc`:
 }
 ```
 
-### Vite
+### For JavaScript users
+
+You can use it with [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx). You can [check this out](https://github.com/LancerComet/vue2-jsx-runtime-webpack) to see how to use it with Babel and Webpack.
+
+### For Vite
 
 Please read the section below.
 
