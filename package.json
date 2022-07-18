@@ -6,6 +6,7 @@
     "dist/",
     "jsx-runtime.js",
     "jsx-runtime.mjs",
+    "jsx-dev-runtime.js",
     "README.md"
   ],
   "main": "jsx-runtime.js",
