@@ -178,6 +178,12 @@ Native is only available for Vue components.
 
 ### HTML / Component ref
 
+#### Vue ≤ 2.6
+
+Due to the limitation, using ref is a little different from to Vue 3.
+
+You can check [this](https://github.com/vuejs/composition-api#limitations) out for more information.
+
 ```tsx
 import { ComponentPublicInstance, defineComponent, onMounted } from '@vue/composition-api'
 
@@ -206,9 +212,29 @@ const Wrapper = defineComponent({
 })
 ```
 
-Due to limitations, using ref is a little different from to Vue 3.
+#### Vue 2.7+
 
-You can check [this](https://github.com/vuejs/composition-api#limitations) out for more information.
+Vue 2.7 has its built-in composition API support, and the behavior acts as the same as Vue 3.
+
+```tsx
+import { ref, defineComponent } from 'vue'
+
+const Example = defineComponent({
+  setup () {
+    const dogeRef = ref<HTMLElement>()
+  
+    onMounted(() => {
+      console.log(dogeRef.value)
+    })
+
+    return () => (
+      <div>
+        <div ref={dogeRef}>Wow very doge</div>
+      </div>
+    )
+  }
+})
+```
 
 ### Slot
 
