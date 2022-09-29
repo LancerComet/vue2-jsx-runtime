@@ -1,7 +1,9 @@
 /* eslint-disable no-undef */
+import Vue from 'vue'
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
 import { sleep } from './utils/sleep'
+import { getValueFromObject, setValueToObject } from '../lib/utils'
 
 describe('v-model composition API testing.', () => {
   it('v-model on text input should work properly,', async () => {
@@ -236,30 +238,38 @@ describe('v-model composition API testing.', () => {
   })
 
   it('Deep binding should work properly.', async () => {
-    const userInputRef = ref({
-      username: 'John Smith',
-      detail: {
-        age: 1
-      }
-    })
+    const test = async (keyPath: string, initValue: any, finalValue: any) => {
+      const inputRef = ref({
+        username: '',
+        detail: {
+          age: '0'
+        }
+      })
 
-    const Example = defineComponent({
-      setup () {
-        return () => (
-          <input type='text' v-model={[userInputRef, 'username']} />
-        )
-      }
-    })
+      setValueToObject(inputRef.value, keyPath, initValue)
 
-    const wrapper = shallowMount(Example)
-    const input = wrapper.find('input')
-    const inputElement = input.element as HTMLInputElement
+      const Example = defineComponent({
+        setup () {
+          return () => (
+            <input type='text' v-model={[inputRef, keyPath]} />
+          )
+        }
+      })
 
-    expect(inputElement.value).toBe('John Smith')
+      const wrapper = shallowMount(Example)
+      const input = wrapper.find('input')
+      const inputElement = input.element as HTMLInputElement
 
-    inputElement.value = 'LancerComet'
-    input.trigger('input')
-    await sleep(10)
-    expect(userInputRef.value.username).toBe('LancerComet')
+      expect(inputElement.value).toBe(initValue)
+
+      inputElement.value = finalValue
+      input.trigger('input')
+      await sleep(10)
+
+      expect(getValueFromObject(inputRef.value, keyPath)).toBe(finalValue)
+    }
+
+    await test('username', 'John Smith', 'LancerComet')
+    await test('detail.age', '1', '100')
   })
 })

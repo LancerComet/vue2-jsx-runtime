@@ -2,7 +2,7 @@
 
 import {
   checkIsHTMLElement, removeNativeOn, removeOn,
-  getValueFromObject
+  getValueFromObject, setValueToObject
 } from '../lib/utils'
 
 it('checkIsHTMLElement.', () => {
@@ -58,4 +58,13 @@ it('getValueFromObject.', () => {
   expect(getValueFromObject({ a: 1 }, 'a')).toBe(1)
   expect(getValueFromObject({ a: 1, b: 2, c: { d: 3 } }, 'c.d')).toBe(3)
   expect(getValueFromObject({}, 'a.b.c.d')).toBe(undefined)
+})
+
+it('setValueToObject.', () => {
+  const target = { a: 0, b: { c: 0 } }
+  setValueToObject(target, 'a', 1)
+  setValueToObject(target, 'b.c', 2)
+
+  expect(target.a).toBe(1)
+  expect(target.b.c).toBe(2)
 })

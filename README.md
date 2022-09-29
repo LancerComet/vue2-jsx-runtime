@@ -390,6 +390,11 @@ const Example = Vue.extend({
 
 #### With modifiers
 
+You can use modifiers to add some extra features:
+
+ - `lazy, number, trim`: These are the built-in modifiers from Vue.
+ - `direct`: See **"About IME"** section below.
+
 ```tsx
 const Example = Vue.extend({
   data: () => ({
@@ -421,16 +426,41 @@ const Example = defineComponent({
 
 #### With argument
 
+Argument for v-model is for deep binding.
+
+Due to limitations, binding properties in Vue 2 are not that kinda convenient:
+
+```ts
+const userRef = ref({
+  detail: {
+    address: ''
+  }
+})
+```
+
+```tsx
+// This works in Vue 3 but doesn't work in Vue 2.
+<input v-model={userRef.value.detail.address} />
+```
+
+So we have to use v-model like:
+
 ```tsx
 const Example = defineComponent({
   setup () {
-    const nameRef = ref('')
-    const ageRef = ref(0)
+    const userRef = ref({
+      username: '',
+      age: 0,
+      detail: {
+        address: ''
+      }
+    })
     
     return () => (
       <div>
-        <input v-model={[nameRef, 'value', ['lazy']]}/>
-        <input v-model={[agRef, 'value', ['number']]}/>
+        <input v-model={[userRef, 'username', ['lazy']]}/>
+        <input v-model={[userRef, 'age', ['number']]}/>
+        <input v-model={[userRef, 'detail.address']}/>
       </div>
     )
   }

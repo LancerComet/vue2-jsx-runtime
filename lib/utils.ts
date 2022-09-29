@@ -79,6 +79,21 @@ const getValueFromObject = (target: any, keyPath: string): any => {
   return value
 }
 
+const setValueToObject = (target: any, keyPath: string, payload: any) => {
+  const keys = keyPath.split('.')
+  let lastTarget: any = target
+  for (let i = 0, length = keys.length; i < length; i++) {
+    const key = keys[i]
+
+    if (i === length - 1) {
+      lastTarget[key] = payload
+      return
+    }
+
+    lastTarget = lastTarget[key]
+  }
+}
+
 export {
   isArray,
   isBoolean,
@@ -106,5 +121,6 @@ export {
   removeOn,
   removeNativeOn,
 
-  getValueFromObject
+  getValueFromObject,
+  setValueToObject
 }

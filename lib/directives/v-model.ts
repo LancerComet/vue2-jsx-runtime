@@ -1,4 +1,4 @@
-import { checkIsRefObj, getValueFromObject, isArray, isString, isUndefined } from '../utils'
+import { checkIsRefObj, getValueFromObject, isArray, isString, isUndefined, setValueToObject } from '../utils'
 import type { Ref } from '@vue/composition-api'
 import type { VNodeData } from 'vue'
 import Vue from 'vue'
@@ -7,8 +7,8 @@ import { getCurrentInstance } from '../runtime'
 
 const IME_START_KEY = '__ime_start__'
 
-type vModelBinding = string |
-  Ref<unknown> |
+type vModelBinding =
+  string | Ref<unknown> |
   [string | Ref<unknown>] |
   [string | Ref<unknown>, string[]] |
   [string | Ref<unknown>, string, string[]]
@@ -58,9 +58,11 @@ const dealWithVModel = (
 
   const emitValue = (payload: unknown) => {
     if (isString(bindingKeyPathOrRef)) {
-      Vue.set(instance, bindingKeyPathOrRef, payload)
+      setValueToObject(instance, bindingKeyPathOrRef, payload)
+      // Vue.set(instance, bindingKeyPathOrRef, payload)
     } else if (argument) {
-      Vue.set(bindingKeyPathOrRef.value as any, argument, payload)
+      setValueToObject(bindingKeyPathOrRef.value, argument, payload)
+      // Vue.set(bindingKeyPathOrRef.value as any, argument, payload)
     } else {
       bindingKeyPathOrRef.value = payload
     }
