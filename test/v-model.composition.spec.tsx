@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
 import { sleep } from './utils/sleep'
@@ -234,5 +233,33 @@ describe('v-model composition API testing.', () => {
     await sleep(10)
     expect(johnInputEl.checked).toBe(false)
     expect(smithInputEl.checked).toBe(false)
+  })
+
+  it('Deep binding should work properly.', async () => {
+    const userInputRef = ref({
+      username: 'John Smith',
+      detail: {
+        age: 1
+      }
+    })
+
+    const Example = defineComponent({
+      setup () {
+        return () => (
+          <input type='text' v-model={[userInputRef, 'username']} />
+        )
+      }
+    })
+
+    const wrapper = shallowMount(Example)
+    const input = wrapper.find('input')
+    const inputElement = input.element as HTMLInputElement
+
+    expect(inputElement.value).toBe('John Smith')
+
+    inputElement.value = 'LancerComet'
+    input.trigger('input')
+    await sleep(10)
+    expect(userInputRef.value.username).toBe('LancerComet')
   })
 })

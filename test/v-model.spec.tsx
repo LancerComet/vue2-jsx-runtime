@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
 import { sleep } from './utils/sleep'
@@ -58,8 +57,4 @@ describe('v-model IME testing.', () => {
     await sleep(10)
     expect(userInputRef.value).toBe('wow i am typing in ime and i wanna select some japanese character')
   })
-})
-
-describe('v-model argument testing.', () => {
-
 })
