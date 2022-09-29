@@ -1,6 +1,9 @@
 /* eslint-disable no-undef */
 
-import { checkIsHTMLElement, removeNativeOn, removeOn } from '../lib/utils'
+import {
+  checkIsHTMLElement, removeNativeOn, removeOn,
+  getValueFromObject
+} from '../lib/utils'
 
 it('checkIsHTMLElement.', () => {
   const htmlTagList = [
@@ -49,4 +52,10 @@ it('removeNativeOn', () => {
   expect(removeNativeOn('onClipboardData:native')).toBe('clipboardData')
   expect(removeNativeOn('on-something-went-wrong:native')).toBe('somethingWentWrong')
   expect(removeNativeOn('on_something-wentWrong_again:native')).toBe('somethingWentWrongAgain')
+})
+
+it('getValueFromObject.', () => {
+  expect(getValueFromObject({ a: 1 }, 'a')).toBe(1)
+  expect(getValueFromObject({ a: 1, b: 2, c: { d: 3 } }, 'c.d')).toBe(3)
+  expect(getValueFromObject({}, 'a.b.c.d')).toBe(undefined)
 })

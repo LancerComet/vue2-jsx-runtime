@@ -61,6 +61,24 @@ const removeNativeOn = (key: string) => camelCase(key
   .replace(ON_EVENT_REGEXP, '')
 )
 
+const getValueFromObject = (target: any, keyPath: string): any => {
+  const keys = keyPath.split('.')
+  let value: any
+  for (let i = 0, length = keys.length; i < length; i++) {
+    const key = keys[i]
+    if (i === 0) {
+      value = target[key]
+      continue
+    }
+
+    if (typeof value !== 'undefined') {
+      const currentValue = value[key]
+      value = currentValue
+    }
+  }
+  return value
+}
+
 export {
   isArray,
   isBoolean,
@@ -86,5 +104,7 @@ export {
   checkKeyIsVueDirective,
 
   removeOn,
-  removeNativeOn
+  removeNativeOn,
+
+  getValueFromObject
 }
