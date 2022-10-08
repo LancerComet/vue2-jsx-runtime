@@ -426,24 +426,22 @@ const Example = defineComponent({
 
 #### With argument
 
-Argument for v-model is for deep binding.
+Argument of v-model is designed for binding properties.
 
-Due to limitations, binding properties in Vue 2 are not that kinda convenient:
+Due to limitation, binding properties in Vue 2 isn't that kinda convenient:
 
-```ts
+```tsx
 const userRef = ref({
   detail: {
     address: ''
   }
 })
-```
 
-```tsx
 // This works in Vue 3 but doesn't work in Vue 2.
 <input v-model={userRef.value.detail.address} />
 ```
 
-So we have to use v-model like:
+We have to use v-model like:
 
 ```tsx
 const Example = defineComponent({
