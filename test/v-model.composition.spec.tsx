@@ -1,5 +1,4 @@
 /* eslint-disable no-undef */
-import Vue from 'vue'
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
 import { sleep } from './utils/sleep'

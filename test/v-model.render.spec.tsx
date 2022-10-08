@@ -246,4 +246,44 @@ describe('v-model render function testing.', () => {
     expect(johnInputEl.checked).toBe(false)
     expect(smithInputEl.checked).toBe(false)
   })
+
+  it('Deep binding should work properly.', async () => {
+    const Example = Vue.extend({
+      data: () => ({
+        user: {
+          username: 'John Smith',
+          age: '1'
+        }
+      }),
+      render: () => (
+        <div>
+          <input class='username' v-model='user.username'/>
+          <input class='age' v-model='user.age'/>
+        </div>
+      )
+    })
+
+    const wrapper = shallowMount(Example)
+    const usernameInput = wrapper.find('input.username')
+    const ageInput = wrapper.find('input.age')
+    const usernameInputEl = usernameInput.element as HTMLInputElement
+    const ageInputEl = ageInput.element as HTMLInputElement
+    const vm = wrapper.vm
+
+    expect(vm.user.username).toBe('John Smith')
+    expect(vm.user.age).toBe('1')
+    expect(usernameInputEl.value).toBe('John Smith')
+    expect(ageInputEl.value).toBe('1')
+
+    usernameInputEl.value = 'LancerComet'
+    ageInputEl.value = '100'
+    usernameInput.trigger('input')
+    ageInput.trigger('input')
+    await sleep(10)
+
+    expect(vm.user.username).toBe('LancerComet')
+    expect(vm.user.age).toBe('100')
+    expect(usernameInputEl.value).toBe('LancerComet')
+    expect(ageInputEl.value).toBe('100')
+  })
 })
