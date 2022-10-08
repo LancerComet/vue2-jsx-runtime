@@ -1,7 +1,6 @@
 import { checkIsRefObj, getValueFromObject, isArray, isString, isUndefined, setValueToObject } from '../utils'
 import type { Ref } from '@vue/composition-api'
 import type { VNodeData } from 'vue'
-import Vue from 'vue'
 import { ConfigType, TagType } from '../type'
 import { getCurrentInstance } from '../runtime'
 
