@@ -1,8 +1,8 @@
 /* eslint-disable no-undef */
-
 import { defineComponent, ref } from '@vue/composition-api'
 import { shallowMount } from '@vue/test-utils'
 import { sleep } from './utils/sleep'
+import { getValueFromObject, setValueToObject } from '../lib/utils'
 
 describe('v-model composition API testing.', () => {
   it('v-model on text input should work properly,', async () => {
@@ -234,5 +234,41 @@ describe('v-model composition API testing.', () => {
     await sleep(10)
     expect(johnInputEl.checked).toBe(false)
     expect(smithInputEl.checked).toBe(false)
+  })
+
+  it('Deep binding should work properly.', async () => {
+    const test = async (keyPath: string, initValue: any, finalValue: any) => {
+      const inputRef = ref({
+        username: '',
+        detail: {
+          age: '0'
+        }
+      })
+
+      setValueToObject(inputRef.value, keyPath, initValue)
+
+      const Example = defineComponent({
+        setup () {
+          return () => (
+            <input type='text' v-model={[inputRef, keyPath]} />
+          )
+        }
+      })
+
+      const wrapper = shallowMount(Example)
+      const input = wrapper.find('input')
+      const inputElement = input.element as HTMLInputElement
+
+      expect(inputElement.value).toBe(initValue)
+
+      inputElement.value = finalValue
+      input.trigger('input')
+      await sleep(10)
+
+      expect(getValueFromObject(inputRef.value, keyPath)).toBe(finalValue)
+    }
+
+    await test('username', 'John Smith', 'LancerComet')
+    await test('detail.age', '1', '100')
   })
 })

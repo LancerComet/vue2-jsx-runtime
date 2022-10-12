@@ -1,4 +1,4 @@
-import { checkIsRefObj, isArray, isString, isUndefined } from '../utils'
+import { checkIsRefObj, getValueFromObject, isArray, isString, isUndefined, setValueToObject } from '../utils'
 import type { Ref } from '@vue/composition-api'
 import type { VNodeData } from 'vue'
 import { ConfigType, TagType } from '../type'
@@ -6,8 +6,8 @@ import { getCurrentInstance } from '../runtime'
 
 const IME_START_KEY = '__ime_start__'
 
-type vModelBinding = string |
-  Ref<unknown> |
+type vModelBinding =
+  string | Ref<unknown> |
   [string | Ref<unknown>] |
   [string | Ref<unknown>, string[]] |
   [string | Ref<unknown>, string, string[]]
@@ -19,61 +19,83 @@ const dealWithVModel = (
   vNodeData: VNodeData,
   isHTMLElement: boolean
 ) => {
-  let bindingTarget: string | Ref<unknown>
-  // let argument: string | undefined
+  let bindingKeyPathOrRef: string | Ref<unknown>
+  let argument: string | undefined
   let modifiers: string[] = []
 
   if (isString(bindingExpression) || checkIsRefObj(bindingExpression)) {
-    bindingTarget = bindingExpression
+    bindingKeyPathOrRef = bindingExpression
   } else if (isArray(bindingExpression)) {
-    bindingTarget = bindingExpression[0]
+    bindingKeyPathOrRef = bindingExpression[0]
     if (bindingExpression.length === 2) {
-      modifiers = bindingExpression[1]
+      if (isArray(bindingExpression[1])) {
+        modifiers = bindingExpression[1]
+      } else if (isString(bindingExpression[1])) {
+        argument = bindingExpression[1]
+      }
     } else if (bindingExpression.length === 3) {
-      // argument = bindingExpression[1]
+      argument = bindingExpression[1]
       modifiers = bindingExpression[2]
     }
   }
 
   const instance = getCurrentInstance()
+  const getBindingValue = () => {
+    // v-model='a.b.c'
+    if (isString(bindingKeyPathOrRef)) {
+      return getValueFromObject(instance, bindingKeyPathOrRef)
+    }
 
+    // v-model={[xxRef, 'a.b.c']}
+    if (argument) {
+      return getValueFromObject(bindingKeyPathOrRef.value, argument)
+    }
+
+    // v-model={xxRef}
+    return bindingKeyPathOrRef.value
+  }
+
+  const emitValue = (payload: unknown) => {
+    if (isString(bindingKeyPathOrRef)) {
+      setValueToObject(instance, bindingKeyPathOrRef, payload)
+      // Vue.set(instance, bindingKeyPathOrRef, payload)
+    } else if (argument) {
+      setValueToObject(bindingKeyPathOrRef.value, argument, payload)
+      // Vue.set(bindingKeyPathOrRef.value as any, argument, payload)
+    } else {
+      bindingKeyPathOrRef.value = payload
+    }
+  }
+
+  // <select />.
   if (tag === 'select') {
-    vNodeData.domProps.value = isString(bindingTarget)
-      ? instance[bindingTarget]
-      : bindingTarget.value
+    vNodeData.domProps.value = getBindingValue()
     vNodeData.on.change = (event: Event) => {
       const target = event.target as HTMLSelectElement
-      if (isString(bindingTarget)) {
-        instance[bindingTarget] = target.value
-      } else {
-        bindingTarget.value = target.value
-      }
+      const payload = target.value
+      emitValue(payload)
     }
     return
   }
 
+  // <input radio|checkbox />.
   if (tag === 'input') {
     const inputType = config.type // 'file', 'text', 'number', .ect.
 
     // Skip unsupported input.
-    const isSkippedInput = /button|file|submit|reset/.test(inputType)
-    if (isSkippedInput) {
+    const isSkippedType = /button|file|submit|reset/.test(inputType)
+    if (isSkippedType) {
       return
     }
 
     // Radio.
     const isRadioInput = inputType === 'radio'
     if (isRadioInput) {
-      vNodeData.domProps.checked = isString(bindingTarget)
-        ? instance[bindingTarget] === config.value
-        : bindingTarget.value === config.value
+      vNodeData.domProps.checked = getBindingValue() === config.value
       vNodeData.on.change = (event: Event) => {
         const target = event.target as HTMLInputElement
-        if (isString(bindingTarget)) {
-          instance[bindingTarget] = target.value
-        } else {
-          bindingTarget.value = target.value
-        }
+        const payload = target.value
+        emitValue(payload)
       }
       return
     }
@@ -100,70 +122,49 @@ const dealWithVModel = (
           const target = event.target as HTMLInputElement
           const isValueSpecified = !isUndefined(config.value)
           const newCheckStatus = target.checked
-          if (isString(bindingTarget)) {
-            instance[bindingTarget] = isValueSpecified
-              ? target.value
-              : newCheckStatus ? checkboxDefaultValue : undefined
-          } else {
-            bindingTarget.value = isValueSpecified
-              ? target.value
-              : newCheckStatus ? checkboxDefaultValue : undefined
-          }
+          const payload = isValueSpecified
+            ? target.value
+            : newCheckStatus ? checkboxDefaultValue : undefined
+          emitValue(payload)
         }
       }
 
-      let bindingValue: unknown
-      if (isString(bindingTarget)) {
-        bindingValue = instance[bindingTarget]
-      } else {
-        bindingValue = bindingTarget.value
-      }
+      const bindingValue: unknown = getBindingValue()
 
       if (isArray(bindingValue)) {
-        // Array binding.
         arrayBindingExec(bindingValue)
       } else {
-        // Basic binding.
         basicBindingExec(bindingValue)
       }
       return
     }
   }
 
-  // Others are treated as text fields.
+  // <input /> | <textarea />.
   if (tag === 'input' || tag === 'textarea') {
     const isDirectInput = modifiers.includes('direct')
     const isLazyInput = modifiers.includes('lazy')
-    const emitValue = (value: string) => {
+    const emit = (value: string) => {
       const hasNumberModifier = modifiers.includes('number')
       const hasTrimModifier = modifiers.includes('trim')
-      const newValue = hasNumberModifier
+      const payload = hasNumberModifier
         ? parseFloat(value)
         : hasTrimModifier
           ? value.trim()
           : value
 
-      if (isString(bindingTarget)) {
-        instance[bindingTarget] = newValue
-      } else {
-        bindingTarget.value = newValue
-      }
+      emitValue(payload)
     }
 
     vNodeData.attrs[IME_START_KEY] = false
-    vNodeData.domProps.value = isString(bindingTarget)
-      ? instance[bindingTarget]
-      : bindingTarget.value
+    vNodeData.domProps.value = getBindingValue()
     vNodeData.on.input = (event: Event) => {
-      if (
-        isLazyInput ||
-        (!isDirectInput && vNodeData.attrs[IME_START_KEY])
-      ) {
+      if (isLazyInput || (!isDirectInput && vNodeData.attrs[IME_START_KEY])) {
         return
       }
 
       const target = event.target as HTMLInputElement
-      emitValue(target.value)
+      emit(target.value)
     }
 
     if (isLazyInput) {
@@ -190,16 +191,9 @@ const dealWithVModel = (
 
   // v-model on component.
   if (!isHTMLElement) {
-    const instance = getCurrentInstance()
-    vNodeData.props.value = isString(bindingTarget)
-      ? instance[bindingTarget]
-      : bindingTarget.value
-    vNodeData.on.input = (value) => {
-      if (isString(bindingTarget)) {
-        instance[bindingTarget] = value
-      } else {
-        bindingTarget.value = value
-      }
+    vNodeData.props.value = getBindingValue()
+    vNodeData.on.input = (payload) => {
+      emitValue(payload)
     }
   }
 }
