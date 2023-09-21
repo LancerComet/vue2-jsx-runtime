@@ -16,7 +16,9 @@ import {
   isArray,
   isUndefined,
   removeNativeOn,
-  removeOn, checkKeyIsRef
+  removeOn,
+  checkKeyIsRef,
+  checkKeyIsRefInFor
 } from './utils'
 import { dealWithDirective } from './directives'
 import { ConfigType, TagType } from './type'
@@ -122,6 +124,12 @@ const jsx = function (
     // ref.
     if (checkKeyIsRef(key)) {
       vNodeData.ref = value
+      continue
+    }
+
+    // refInFor.
+    if (checkKeyIsRefInFor(key)) {
+      vNodeData.refInFor = value
       continue
     }
 

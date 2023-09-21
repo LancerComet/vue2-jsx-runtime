@@ -44,6 +44,7 @@ const checkKeyIsKey = (key: string) => KEY_REGEXP.test(key)
 const checkKeyIsNativeOn = (key: string) => NATIVE_ON_REGEXP.test(key)
 const checkKeyIsVueDirective = (key: string) => VUE_DIRECTIVE_REGEXP.test(key)
 const checkKeyIsRef = (key: string) => key === 'ref'
+const checkKeyIsRefInFor = (key: string) => key === 'refInFor'
 
 // The reason why I don't use "isRef" which is provided by @vue/composition-api is that
 // this function will be broken under SWC.
@@ -115,6 +116,7 @@ export {
   checkKeyIsNativeOn,
   checkKeyIsRef,
   checkIsRefObj,
+  checkKeyIsRefInFor,
 
   checkKeyIsVueDirective,
 

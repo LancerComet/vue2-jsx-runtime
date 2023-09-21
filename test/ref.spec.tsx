@@ -18,6 +18,9 @@ it('Ref should work properly.', (done) => {
       <div>
         <Example ref='example' />
         <div ref='doge'>Wow very doge</div>
+        <div ref='r1' refInFor>Wow very doge1</div>
+        <div ref='r1' refInFor>Wow very doge2</div>
+        <div ref='r1' refInFor>Wow very doge3</div>
       </div>
     ),
     mounted () {
@@ -28,6 +31,11 @@ it('Ref should work properly.', (done) => {
 
       const example = refs.example as ComponentPublicInstance<any, any>
       expect(example.$el.textContent).toBe('Example')
+
+      const multiRefs = refs.r1
+      expect(Array.isArray(multiRefs)).toBe(true)
+      expect(multiRefs.map(r => r.textContent))
+        .toEqual(Array.from({ length: 3 }, (_, idx) => `Wow very doge${idx + 1}`))
 
       done()
     }
