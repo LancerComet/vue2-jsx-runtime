@@ -18,7 +18,8 @@ import {
   removeNativeOn,
   removeOn,
   checkKeyIsRef,
-  checkKeyIsRefInFor
+  checkKeyIsRefInFor,
+  checkKeyIsAttrs
 } from './utils'
 import { dealWithDirective } from './directives'
 import { ConfigType, TagType } from './type'
@@ -56,6 +57,15 @@ const jsx = function (
 
   const attrKeys = Object.keys(config)
   for (let key of attrKeys) {
+    // attrs
+    if (checkKeyIsAttrs(key)) {
+      Object.keys(config[key]).forEach(k => {
+        config[k] = config[key][k]
+        attrKeys.push(k)
+      })
+      continue
+    }
+
     // Children shouldn't be set in vNodeData.
     if (checkKeyIsChildren(key)) {
       continue
