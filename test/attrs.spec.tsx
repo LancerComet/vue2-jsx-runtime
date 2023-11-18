@@ -62,6 +62,22 @@ describe('HTML testing.', () => {
 
     const wrapper = shallowMount(Comp)
   })
+
+  it('Should support attr spread operator.', () => {
+    const wrapper = shallowMount({
+      setup () {
+        const attrs = {
+          type: 'email',
+          placeholder: 'Enter your email'
+        }
+
+        return () => (
+          <input { ...{ attrs } } />
+        )
+      }
+    })
+    expect(wrapper.html()).toBe('<input type="email" placeholder="Enter your email">')
+  })
 })
 
 describe('Vue component testing.', () => {
